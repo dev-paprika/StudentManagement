@@ -1,21 +1,27 @@
 package management.student.ManagementStudent;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
 public class ManagementStudentApplication {
 
-  private String name = "paprika"; //名前
-  private String age = "37";  //年齢
+  @Autowired
+  //Springが管理しているインスタンスをメンバ変数に入れてくれる（自動で紐づけしますよ。）
+  private StudentRepository repository;
   private final Map<String, String> studentMap = new HashMap<>(); //受講生の情報
 
   public static void main(String[] args) {
@@ -23,35 +29,63 @@ public class ManagementStudentApplication {
   }
 
   /**
-   * 受講生の情報（メンバ変数）を取得
+   * リクエストパラメータに渡されたnameに紐づく受講生の情報を取得
    *
-   * @return
+   * @return String 受講生情報
    */
   @GetMapping("/studentInfo")
-  public String getStudentInfo() {
-    return this.name + " " + this.age + "歳";
+  public String getStudentInfo(@RequestParam String name) {
+    Student student = this.repository.searchByName(name);
+    return student.getName() + " " + student.getAge() + "歳";
   }
 
   /**
-   * 受講生の情報（メンバ変数）を設定
+   * リクエストパラメータに渡されたnameに紐づく受講生の情報を取得
+   *
+   * @return String 全受講生情報
+   */
+  @GetMapping("/studentAll")
+  public String getAllStudentInfo() {
+    List<Student> students = this.repository.searchAllStudent();
+    StringBuilder result = new StringBuilder();
+    //全件出力
+    for (Student student : students) {
+      result.append(student.getName()).append(" ").append(student.getAge()).append("歳<br>");
+    }
+    return result.toString();
+  }
+
+  /**
+   * 受講生の情報を設定
    *
    * @param name 　名前
    * @param age  　年齢
    */
   @PostMapping("/studentInfo")
-  public void setStudentInfo(String name, String age) {
-    this.name = name;
-    this.age = age;
+  public void setStudentInfo(String name, int age) {
+    this.repository.registerStudent(name, age);
+  }
+
+
+  /**
+   * 受講生の年齢を更新
+   *
+   * @param name 　名前
+   * @param age  　年齢
+   */
+  @PatchMapping("/studentInfo")
+  public void updateStudentName(String name, int age) {
+    this.repository.updateStudent(name, age);
   }
 
   /**
-   * 受講生の名前（メンバ変数）を設定
+   * 受講生を削除
    *
-   * @param name 　名前
+   * @param name 名前
    */
-  @PostMapping("/studentName")
-  public void updateStudentName(String name) {
-    this.name = name;
+  @DeleteMapping("studentInfo")
+  public void deleteStudent(String name) {
+    this.repository.deleteStudent(name);
   }
 
   /**
@@ -65,6 +99,7 @@ public class ManagementStudentApplication {
     //Mapに受講生を追加する
     this.studentMap.put(name, age);
   }
+
 
   /**
    * 受講生の情報をメンバ変数のMapに追加する

@@ -21,6 +21,11 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.14.0'
+    // MySQLドライバ
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    //MyBatis
+    implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '3.0.3'
+
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
