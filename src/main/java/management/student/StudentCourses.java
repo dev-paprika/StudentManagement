@@ -1,4 +1,4 @@
-package management.student.ManagementStudent;
+package management.student;
 
 import java.sql.Timestamp;
 import lombok.Getter;

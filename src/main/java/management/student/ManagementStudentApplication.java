@@ -1,4 +1,4 @@
-package management.student.ManagementStudent;
+package management.student;
 
 import java.util.HashMap;
 import java.util.List;
