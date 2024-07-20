@@ -24,11 +24,7 @@ public class StudentService {
    * @return String 受講生情報
    */
   public List<Student> getStudentList() {
-    //課題：30代の人のみを抽出する
     List<Student> students = this.repository.searchStudents();
-    students = students.stream()
-        .filter(v -> v.getAge() >= 30 && v.getAge() < 40)
-        .toList();
     return students;
   }
 
@@ -38,11 +34,7 @@ public class StudentService {
    * @return String 受講生情報
    */
   public List<StudentCourses> getStudentCourseList() {
-    //課題：Javaのコースのみ抽出
     List<StudentCourses> courses = this.repository.searchCourses();
-    courses = courses.stream()
-        .filter(v -> v.getCourseName().matches(".*Java.*"))
-        .toList();
     return courses;
   }
 
