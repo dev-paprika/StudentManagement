@@ -1,9 +1,9 @@
-package management.student.ManagementStudent.service;
+package management.student.service;
 
 import java.util.List;
-import management.student.ManagementStudent.data.Student;
-import management.student.ManagementStudent.data.StudentCourses;
-import management.student.ManagementStudent.repository.StudentRepository;
+import management.student.data.Student;
+import management.student.data.StudentCourses;
+import management.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

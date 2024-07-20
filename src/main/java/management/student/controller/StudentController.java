@@ -1,9 +1,9 @@
-package management.student.ManagementStudent.controller;
+package management.student.controller;
 
 import java.util.List;
-import management.student.ManagementStudent.data.Student;
-import management.student.ManagementStudent.data.StudentCourses;
-import management.student.ManagementStudent.service.StudentService;
+import management.student.data.Student;
+import management.student.data.StudentCourses;
+import management.student.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
