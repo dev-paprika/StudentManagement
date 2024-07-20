@@ -1,6 +1,8 @@
-package management.student.ManagementStudent;
+package management.student.ManagementStudent.repository;
 
 import java.util.List;
+import management.student.ManagementStudent.data.Student;
+import management.student.ManagementStudent.data.StudentCourses;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
