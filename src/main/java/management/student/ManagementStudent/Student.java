@@ -1,26 +1,21 @@
 package management.student.ManagementStudent;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class Student {
 
+  private int id; //id
   private String name; //名前
   private int age; //年齢
-
-  //以降setter,getter
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public int getAge() {
-    return age;
-  }
-
-  public void setAge(int age) {
-    this.age = age;
-  }
+  private String furigana;  //かな
+  private String gender;  //性別
+  private String nickname;  //ニックネーム
+  private String email;   //e-mail
+  private String region;    //地域
+  private String phoneNumber;  //電話番号
 
 
 }
