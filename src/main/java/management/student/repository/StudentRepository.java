@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface StudentRepository {
 
-  @Select("SELECT * FROM student ")
+  @Select("SELECT * FROM student where delete_flag = 0")
   List<Student> searchStudents();
 
   @Select("SELECT * FROM student_courses ")
