@@ -4,13 +4,13 @@ import java.util.List;
 import management.student.converter.StudentConverter;
 import management.student.data.Student;
 import management.student.data.StudentCourses;
-import management.student.domain.StudentDetail;
 import management.student.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 public class StudentController {
 
   private StudentService service;
@@ -28,11 +28,12 @@ public class StudentController {
    * @return String 受講生情報
    */
   @GetMapping("/student")
-  public List<StudentDetail> getStudentList() {
+  public String getStudentList(Model model) {
     List<Student> students = this.service.getStudentList();
     List<StudentCourses> courses = this.service.getStudentCourseList();
-    // コンバートしたものを取得する
-    return converter.convertStudentDetails(students, courses);
+    // コンバートしてモデルに設定
+    model.addAttribute("studentList", converter.convertStudentDetails(students, courses));
+    return "studentList";
   }
 
 
