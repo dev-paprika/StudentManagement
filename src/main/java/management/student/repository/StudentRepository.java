@@ -30,7 +30,7 @@ public interface StudentRepository {
   /**
    * 受講生登録
    *
-   * @param student
+   * @param student 　受講生
    */
   @Insert("INSERT INTO student ("
       + "  name,"
@@ -59,7 +59,7 @@ public interface StudentRepository {
   /**
    * 受講生コース登録
    *
-   * @param studentCourses
+   * @param studentCourses 　受講生コース
    */
   @Insert("INSERT INTO student_courses ("
       + "  student_id,"

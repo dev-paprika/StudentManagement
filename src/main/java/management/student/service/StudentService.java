@@ -25,8 +25,7 @@ public class StudentService {
    * @return String 受講生情報
    */
   public List<Student> getStudentList() {
-    List<Student> students = this.repository.searchStudents();
-    return students;
+    return this.repository.searchStudents();
   }
 
   /**
@@ -35,14 +34,13 @@ public class StudentService {
    * @return String 受講生情報
    */
   public List<StudentCourses> getStudentCourseList() {
-    List<StudentCourses> courses = this.repository.searchCourses();
-    return courses;
+    return this.repository.searchCourses();
   }
 
   /**
    * 受講生とコース登録
    *
-   * @param studentDetail
+   * @param studentDetail 　受講生詳細
    */
   public void registerStudent(StudentDetail studentDetail) {
     //受講生を登録
