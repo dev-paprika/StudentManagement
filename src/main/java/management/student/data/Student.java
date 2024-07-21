@@ -16,6 +16,8 @@ public class Student {
   private String email;   //e-mail
   private String region;    //地域
   private String phoneNumber;  //電話番号
+  private String remarks; //備考
+  private boolean deleteFlag; //削除フラグ
 
 
 }
