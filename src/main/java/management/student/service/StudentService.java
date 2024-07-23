@@ -42,15 +42,34 @@ public class StudentService {
    *
    * @param studentDetail 　受講生詳細
    */
-  public void registerStudent(StudentDetail studentDetail) {
+  public void register(StudentDetail studentDetail) {
     //受講生を登録
     Student student = studentDetail.getStudent();
     StudentCourses courses = studentDetail.getStudentCourses().getFirst();
     //@Optionを指定しているので、登録時にstudentにIDが設定される
-    this.repository.createStudent(student);
+    resister(student);
     //受講生IDを取得してコース情報に設定してから受講生コース登録
     courses.setStudentId(student.getId());
+    resister(courses);
+  }
+
+  /**
+   * 受講生登録
+   *
+   * @param student 　受講生
+   */
+  private void resister(Student student) {
+    this.repository.createStudent(student);
+  }
+
+  /**
+   * 受講生コース登録
+   *
+   * @param courses 受講生コース
+   */
+  private void resister(StudentCourses courses) {
     this.repository.createStudentCourse(courses);
   }
+
 
 }

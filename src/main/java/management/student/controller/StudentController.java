@@ -31,7 +31,7 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @GetMapping("/student")
+  @GetMapping("/students")
   public String getStudentList(Model model) {
     List<Student> students = this.service.getStudentList();
     List<StudentCourses> courses = this.service.getStudentCourseList();
@@ -45,7 +45,7 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @GetMapping("/new-student")
+  @GetMapping("/students/new")
   public String resisterStudent(Model model) {
     //オブジェクトは空のものを設定しておかないと画面でエラーになる
     model.addAttribute("studentDetail", new StudentDetail());
@@ -58,13 +58,13 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @PostMapping("/registerStudent")
+  @PostMapping("/students")
   public String resisterStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
     if (result.hasErrors()) {
       return "resisterStudent";
     }
     //受講生登録のサービスのメソッド呼びだし
-    this.service.registerStudent(studentDetail);
+    this.service.register(studentDetail);
     return "redirect:/student";
   }
 
@@ -74,7 +74,7 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @GetMapping("/student-course")
+  @GetMapping("/students/course")
   public List<StudentCourses> getStudentCourseList() {
     return this.service.getStudentCourseList();
   }
