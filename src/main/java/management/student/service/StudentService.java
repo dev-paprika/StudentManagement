@@ -7,6 +7,7 @@ import management.student.domain.StudentDetail;
 import management.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StudentService {
@@ -42,6 +43,7 @@ public class StudentService {
    *
    * @param studentDetail 　受講生詳細
    */
+  @Transactional
   public void register(StudentDetail studentDetail) {
     //受講生を登録
     Student student = studentDetail.getStudent();

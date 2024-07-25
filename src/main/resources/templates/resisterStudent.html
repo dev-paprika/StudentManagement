@@ -20,7 +20,7 @@
 
 <div class="container mt-5">
   <h1 class="text-center mb-4">受講生登録</h1>
-  <form class="form" th:action="@{/registerStudent}" th:object="${studentDetail}" method="post">
+  <form class="form" th:action="@{/students}" th:object="${studentDetail}" method="post">
     <div class="form-group">
       <label for="name">名前：</label>
       <input type="text" class="form-control" id="name" th:field="*{student.name}" required/>
@@ -66,9 +66,14 @@
       <label for="remarks">備考：</label>
       <textarea class="form-control" id="remarks" th:field="*{student.remarks}" rows="3"></textarea>
     </div>
-    <div class="form-group">
-      <label for="courseName">コース名：</label>
-      <select class="form-control" id="courseName" th:field="*{studentCourses[0].courseName}"
+    <!--          複数のコースを受講している場合は複数表示させる-->
+    <div class="form-group" th:each="course, stat : *{studentCourses}">
+
+      <label for="courseName"
+             th:for="studentCourse.__${stat.index}__.courseName">コース名：</label>
+      <select class="form-control" id="courseName"
+              th:id="studentCourse.__${stat.index}__.courseName"
+              th:field="*{studentCourses[__${stat.index}__].courseName}"
               required>
         <option value="" disabled selected>選択してください</option>
         <option value="Java入門">Java入門</option>

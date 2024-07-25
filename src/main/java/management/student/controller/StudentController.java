@@ -1,5 +1,6 @@
 package management.student.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import management.student.converter.StudentConverter;
 import management.student.data.Student;
@@ -48,7 +49,10 @@ public class StudentController {
   @GetMapping("/students/new")
   public String resisterStudent(Model model) {
     //オブジェクトは空のものを設定しておかないと画面でエラーになる
-    model.addAttribute("studentDetail", new StudentDetail());
+    StudentDetail studentDetail = new StudentDetail();
+    // 受講生コースは複数なので、初期表示の場合はタグを表示させるために空の受講生コースオブジェクトを設定
+    studentDetail.setStudentCourses(Arrays.asList(new StudentCourses()));
+    model.addAttribute("studentDetail", studentDetail);
     return "resisterStudent";
   }
 
@@ -65,7 +69,7 @@ public class StudentController {
     }
     //受講生登録のサービスのメソッド呼びだし
     this.service.register(studentDetail);
-    return "redirect:/student";
+    return "redirect:/students";
   }
 
 
