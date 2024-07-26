@@ -20,12 +20,30 @@ public interface StudentRepository {
   List<Student> searchStudents();
 
   /**
+   * 受講生1件検索
+   *
+   * @return 受講生
+   */
+  @Select("SELECT * FROM student where id = #{id} AND delete_flag = 0")
+  Student searchStudentByID(int id);
+
+
+  /**
    * 受講生コース全件検索
    *
    * @return List<StudentCourses> 受講生コース
    */
   @Select("SELECT * FROM student_courses ")
   List<StudentCourses> searchCourses();
+
+  /**
+   * 受講生コース1件検索
+   *
+   * @return 受講生
+   */
+  @Select("SELECT * FROM student_courses where student_id = #{studentId}")
+  List<StudentCourses> searchStudentCourseByID(int studentId);
+
 
   /**
    * 受講生登録

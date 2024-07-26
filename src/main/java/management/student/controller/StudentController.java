@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class StudentController {
@@ -40,6 +41,27 @@ public class StudentController {
     model.addAttribute("studentList", converter.convertStudentDetails(students, courses));
     return "studentList";
   }
+
+
+  /**
+   * 受講生詳細の情報（1件）を取得
+   *
+   * @return String 受講生情報
+   */
+  @GetMapping("/students/update")
+  public String getStudentList(@RequestParam String id, Model model) {
+    //受講生と受講生コース情報取得
+    Student student = this.service.getStudent(Integer.parseInt(id));
+    List<StudentCourses> courses = this.service.getStudentCourses(student.getId());
+    StudentDetail studentDetail = new StudentDetail();
+    studentDetail.setStudent(student);
+    studentDetail.setStudentCourses(courses);
+
+    // モデルに設定
+    model.addAttribute("studentDetail", studentDetail);
+    return "updateStudent";
+  }
+
 
   /**
    * 受講生登録用のページの初期表示

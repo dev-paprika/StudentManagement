@@ -30,12 +30,31 @@ public class StudentService {
   }
 
   /**
+   * 受講生の情報(1件)を取得
+   *
+   * @return String 受講生情報
+   */
+  public Student getStudent(int id) {
+    return this.repository.searchStudentByID(id);
+  }
+
+
+  /**
    * 受講生コースの情報を取得
    *
    * @return String 受講生情報
    */
   public List<StudentCourses> getStudentCourseList() {
     return this.repository.searchCourses();
+  }
+
+  /**
+   * 受講生コースの情報を取得
+   *
+   * @return String 受講生コース
+   */
+  public List<StudentCourses> getStudentCourses(int studentId) {
+    return this.repository.searchStudentCourseByID(studentId);
   }
 
   /**
