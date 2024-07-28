@@ -13,8 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class StudentController {
@@ -48,15 +48,10 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @GetMapping("/students/update")
-  public String getStudentList(@RequestParam String id, Model model) {
+  @GetMapping("/student/{id}")
+  public String getStudent(@PathVariable String id, Model model) {
     //受講生と受講生コース情報取得
-    Student student = this.service.getStudent(Integer.parseInt(id));
-    List<StudentCourses> courses = this.service.getStudentCourses(student.getId());
-    StudentDetail studentDetail = new StudentDetail();
-    studentDetail.setStudent(student);
-    studentDetail.setStudentCourses(courses);
-
+    StudentDetail studentDetail = this.service.getStudent(Integer.parseInt(id));
     // モデルに設定
     model.addAttribute("studentDetail", studentDetail);
     return "updateStudent";
@@ -99,15 +94,14 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @PostMapping("/students/update")
-  public String updateStudent(@ModelAttribute StudentDetail studentDetail,
-      @RequestParam(required = false) String newCourseName, BindingResult result) {
+  @PostMapping("/student/update")
+  public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
     //エラーがある場合は返却する
     if (result.hasErrors()) {
       return "updateStudent";
     }
     //受講生更新のサービスのメソッド呼びだし
-    this.service.update(studentDetail, newCourseName);
+    this.service.update(studentDetail);
     return "redirect:/students";
 
   }

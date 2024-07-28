@@ -64,4 +64,10 @@ public interface StudentRepository {
    */
   void updateStudent(Student student);
 
+  /**
+   * 受講生コース更新
+   *
+   * @param courses 　受講生コース
+   */
+  void updateStudentCourses(StudentCourses courses);
 }

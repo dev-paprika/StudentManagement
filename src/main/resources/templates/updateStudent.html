@@ -19,8 +19,8 @@
 <body>
 
 <div class="container mt-5">
-  <h1 class="text-center mb-4">受講生更新</h1>
-  <form class="form" th:action="@{/students/update}" th:object="${studentDetail}" method="post">
+  <h1 class="text-center mb-4">受講生詳細</h1>
+  <form class="form" th:action="@{/student/update}" th:object="${studentDetail}" method="post">
     <input type="hidden" th:field="*{student.id}"/>
     <div class="form-group">
       <label for="name">名前：</label>
@@ -69,9 +69,15 @@
     </div>
     <!--          複数のコースを受講している場合は複数表示させる-->
     <div class="form-group" th:each="course, stat : *{studentCourses}">
+      <label for="courseId"
+             th:for="studentCourse.__${stat.index}__.id"
+      >コースID：</label>
+      <input type="text" id="courseId"
+             th:id="studentCourse.__${stat.index}__.id"
+             th:field="*{studentCourses[__${stat.index}__].id}" readonly>
+      <br>
       <label for="courseName"
-             th:for="studentCourse.__${stat.index}__.courseName"
-             th:text="'コース名：'+${stat.count}">コース名：</label>
+             th:for="studentCourse.__${stat.index}__.courseName">コース名：</label>
       <select class="form-control" id="courseName"
               th:id="studentCourse.__${stat.index}__.courseName"
               th:field="*{studentCourses[__${stat.index}__].courseName}"
@@ -101,21 +107,7 @@
         </option>
       </select>
     </div>
-    <!-- 新しいコースを追加 -->
-    <div class="form-group">
-      <label for="newCourseName">新しいコース名：</label>
-      <select class="form-control" id="newCourseName" name="newCourseName">
-        <option value="" disabled selected>選択してください</option>
-        <option value="Java入門">Java入門</option>
-        <option value="Web開発基礎">Web開発基礎</option>
-        <option value="Pythonプログラミング">Pythonプログラミング</option>
-        <option value="データサイエンス入門">データサイエンス入門</option>
-        <option value="フロントエンド開発">フロントエンド開発</option>
-        <option value="バックエンド開発">バックエンド開発</option>
-        <option value="Javaプログラミング基礎">Javaプログラミング基礎</option>
-        <option value="Javaプログラミング（フル）">Javaプログラミング（フル）</option>
-      </select>
-    </div>
+
     <div class="text-center">
       <button type="submit" class="btn btn-primary">更新</button>
     </div>

@@ -41,7 +41,7 @@
       <tbody>
       <tr th:each="studentDetail : ${studentList}">
         <td>
-          <a th:href="@{/students/update(id=${studentDetail.student.id})}"
+          <a th:href="@{/student/{id}(id=${studentDetail.student.id})}"
              th:text="${studentDetail.student.id}">1</a>
         </td>
         <td th:text="${studentDetail.student.name}">山田太郎</td>
