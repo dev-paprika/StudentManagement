@@ -81,18 +81,20 @@ public class StudentService {
   }
 
   /**
-   * 受講生更新とコースの追加登録
+   * 受講生とコース更新
    *
    * @param studentDetail 　受講生詳細
    */
   @Transactional
   public void update(StudentDetail studentDetail) {
     //受講生を更新
-    Student student = studentDetail.getStudent();
-    update(student);
+    update(studentDetail.getStudent());
     //コースを更新する
     for (StudentCourses courses : studentDetail.getStudentCourses()) {
-      update(courses);
+      //受講生が削除されていないときのみ更新
+      if (!studentDetail.getStudent().isDeleteFlag()) {
+        update(courses);
+      }
     }
   }
 

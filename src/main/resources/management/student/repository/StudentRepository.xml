@@ -53,7 +53,8 @@
     gender = #{gender},
     remarks = #{remarks},
     email = #{email},
-    region = #{region}
+    region = #{region},
+    delete_flag = #{deleteFlag}
     WHERE id = #{id}
   </update>
 
