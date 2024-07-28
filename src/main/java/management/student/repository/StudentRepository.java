@@ -3,9 +3,7 @@ package management.student.repository;
 import java.util.List;
 import management.student.data.Student;
 import management.student.data.StudentCourses;
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
 @Mapper
@@ -50,28 +48,6 @@ public interface StudentRepository {
    *
    * @param student 　受講生
    */
-  @Insert("INSERT INTO student ("
-      + "  name,"
-      + "  furigana,"
-      + "  nickname,"
-      + "  age,"
-      + "  phone_number,"
-      + "  gender,"
-      + "  remarks,"
-      + "  email,"
-      + "  region"
-      + " ) VALUES ("
-      + "  #{name},"
-      + "  #{furigana},"
-      + "  #{nickname},"
-      + "  #{age},"
-      + "  #{phoneNumber},"
-      + "  #{gender},"
-      + "  #{remarks},"
-      + "  #{email},"
-      + "  #{region}"
-      + " )")
-  @Options(useGeneratedKeys = true, keyProperty = "id")
   void createStudent(Student student);
 
   /**
@@ -79,15 +55,6 @@ public interface StudentRepository {
    *
    * @param studentCourses 　受講生コース
    */
-  @Insert("INSERT INTO student_courses ("
-      + "  student_id,"
-      + "  course_name,"
-      + "  start_date"
-      + " ) VALUES ("
-      + "  #{studentId},"
-      + "  #{courseName},"
-      + "  CURRENT_TIMESTAMP()"
-      + " )")
   void createStudentCourse(StudentCourses studentCourses);
 
   /**
