@@ -94,6 +94,24 @@ public class StudentController {
     return "redirect:/students";
   }
 
+  /**
+   * 受講生詳細の情報（1件）を更新
+   *
+   * @return String 受講生情報
+   */
+  @PostMapping("/students/update")
+  public String updateStudent(@ModelAttribute StudentDetail studentDetail,
+      @RequestParam(required = false) String newCourseName, BindingResult result) {
+    //エラーがある場合は返却する
+    if (result.hasErrors()) {
+      return "updateStudent";
+    }
+    //受講生更新のサービスのメソッド呼びだし
+    this.service.update(studentDetail, newCourseName);
+    return "redirect:/students";
+
+  }
+
 
   /**
    * 受講生コースの情報を取得

@@ -5,6 +5,7 @@ import management.student.data.Student;
 import management.student.data.StudentCourses;
 import management.student.domain.StudentDetail;
 import management.student.repository.StudentRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +76,26 @@ public class StudentService {
   }
 
   /**
+   * 受講生更新とコースの追加登録
+   *
+   * @param studentDetail 　受講生詳細
+   */
+  @Transactional
+  public void update(StudentDetail studentDetail, String courseName) {
+    //受講生を更新
+    Student student = studentDetail.getStudent();
+    update(student);
+    //コースがあればコースを追加登録する
+    if (!StringUtils.isEmpty(courseName)) {
+      StudentCourses courses = new StudentCourses();
+      courses.setCourseName(courseName);
+      //受講生IDを取得してコース情報に設定してから受講生コース登録
+      courses.setStudentId(student.getId());
+      resister(courses);
+    }
+  }
+
+  /**
    * 受講生登録
    *
    * @param student 　受講生
@@ -90,6 +111,15 @@ public class StudentService {
    */
   private void resister(StudentCourses courses) {
     this.repository.createStudentCourse(courses);
+  }
+
+  /**
+   * 受講生更新
+   *
+   * @param student 　受講生
+   */
+  private void update(Student student) {
+    this.repository.updateStudent(student);
   }
 
 

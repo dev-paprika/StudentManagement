@@ -90,4 +90,11 @@ public interface StudentRepository {
       + " )")
   void createStudentCourse(StudentCourses studentCourses);
 
+  /**
+   * 受講生更新
+   *
+   * @param student 　受講生
+   */
+  void updateStudent(Student student);
+
 }

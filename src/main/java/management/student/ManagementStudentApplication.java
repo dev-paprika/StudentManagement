@@ -3,11 +3,13 @@ package management.student;
 import java.util.HashMap;
 import java.util.Map;
 import management.student.repository.StudentRepository;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
+@MapperScan
 public class ManagementStudentApplication {
 
   @Autowired
