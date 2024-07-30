@@ -48,7 +48,7 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @GetMapping("/student/{id}")
+  @GetMapping("/students/{id}")
   public String getStudent(@PathVariable String id, Model model) {
     //受講生と受講生コース情報取得
     StudentDetail studentDetail = this.service.getStudent(Integer.parseInt(id));
@@ -94,7 +94,7 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @PostMapping("/student/update")
+  @PostMapping("/students/update")
   public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
     //エラーがある場合は返却する
     if (result.hasErrors()) {
