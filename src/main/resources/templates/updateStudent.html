@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>受講生一覧</title>
+  <title>受講生更新</title>
   <!-- BootstrapのCDNでのcss読み込み -->
   <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
@@ -19,8 +19,9 @@
 <body>
 
 <div class="container mt-5">
-  <h1 class="text-center mb-4">受講生登録</h1>
-  <form class="form" th:action="@{/students}" th:object="${studentDetail}" method="post">
+  <h1 class="text-center mb-4">受講生更新</h1>
+  <form class="form" th:action="@{/students/update}" th:object="${studentDetail}" method="post">
+    <input type="hidden" th:field="*{student.id}"/>
     <div class="form-group">
       <label for="name">名前：</label>
       <input type="text" class="form-control" id="name" th:field="*{student.name}" required/>
@@ -68,13 +69,42 @@
     </div>
     <!--          複数のコースを受講している場合は複数表示させる-->
     <div class="form-group" th:each="course, stat : *{studentCourses}">
-
       <label for="courseName"
-             th:for="studentCourse.__${stat.index}__.courseName">コース名：</label>
+             th:for="studentCourse.__${stat.index}__.courseName"
+             th:text="'コース名：'+${stat.count}">コース名：</label>
       <select class="form-control" id="courseName"
               th:id="studentCourse.__${stat.index}__.courseName"
               th:field="*{studentCourses[__${stat.index}__].courseName}"
               required>
+        <option value="" disabled selected>選択してください</option>
+        <option value="Java入門" th:selected="${course.courseName == 'Java入門'}">Java入門</option>
+        <option value="Web開発基礎" th:selected="${course.courseName == 'Web開発基礎'}">
+          Web開発基礎
+        </option>
+        <option value="Pythonプログラミング"
+                th:selected="${course.courseName == 'Pythonプログラミング'}">Pythonプログラミング
+        </option>
+        <option value="データサイエンス入門"
+                th:selected="${course.courseName == 'データサイエンス入門'}">データサイエンス入門
+        </option>
+        <option value="フロントエンド開発"
+                th:selected="${course.courseName == 'フロントエンド開発'}">フロントエンド開発
+        </option>
+        <option value="バックエンド開発" th:selected="${course.courseName == 'バックエンド開発'}">
+          バックエンド開発
+        </option>
+        <option value="Javaプログラミング基礎"
+                th:selected="${course.courseName == 'Javaプログラミング基礎'}">Javaプログラミング基礎
+        </option>
+        <option value="Javaプログラミング（フル）"
+                th:selected="${course.courseName == 'Javaプログラミング（フル）'}">Javaプログラミング（フル）
+        </option>
+      </select>
+    </div>
+    <!-- 新しいコースを追加 -->
+    <div class="form-group">
+      <label for="newCourseName">新しいコース名：</label>
+      <select class="form-control" id="newCourseName" name="newCourseName">
         <option value="" disabled selected>選択してください</option>
         <option value="Java入門">Java入門</option>
         <option value="Web開発基礎">Web開発基礎</option>
@@ -87,7 +117,7 @@
       </select>
     </div>
     <div class="text-center">
-      <button type="submit" class="btn btn-primary">登録</button>
+      <button type="submit" class="btn btn-primary">更新</button>
     </div>
   </form>
 </div>

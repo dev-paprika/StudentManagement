@@ -34,12 +34,16 @@
       <th>年齢</th>
       <th>性別</th>
       <th>備考</th>
+      <th>コース名</th>
 
 
       </thead>
       <tbody>
       <tr th:each="studentDetail : ${studentList}">
-        <td th:text="${studentDetail.student.id}">1</td>
+        <td>
+          <a th:href="@{/students/update(id=${studentDetail.student.id})}"
+             th:text="${studentDetail.student.id}">1</a>
+        </td>
         <td th:text="${studentDetail.student.name}">山田太郎</td>
         <td th:text="${studentDetail.student.furigana}">ヤマダタロウ</td>
         <td th:text="${studentDetail.student.nickname}">タロー</td>
@@ -48,6 +52,13 @@
         <td th:text="${studentDetail.student.age}">２０</td>
         <td th:text="${studentDetail.student.gender}">男性</td>
         <td th:text="${studentDetail.student.remarks}">特になし</td>
+        <td>
+          <!--          複数のコースを受講している場合は複数表示させる-->
+          <span th:each="course, stat : ${studentDetail.studentCourses}">
+            <span th:text="${course.courseName}"></span><br th:if="${!stat.last}"/>
+          </span>
+        </td>
+
 
       </tr>
       </tbody>
