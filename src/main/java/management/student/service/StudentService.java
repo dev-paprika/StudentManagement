@@ -5,7 +5,6 @@ import management.student.data.Student;
 import management.student.data.StudentCourses;
 import management.student.domain.StudentDetail;
 import management.student.repository.StudentRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +34,14 @@ public class StudentService {
    *
    * @return String 受講生情報
    */
-  public Student getStudent(int id) {
-    return this.repository.searchStudentByID(id);
+  public StudentDetail getStudent(int id) {
+    Student student = this.repository.searchStudentByID(id);
+    List<StudentCourses> courses = this.repository.searchStudentCourseByID(student.getId());
+    StudentDetail studentDetail = new StudentDetail();
+    studentDetail.setStudent(student);
+    studentDetail.setStudentCourses(courses);
+    return studentDetail;
+
   }
 
 
@@ -76,22 +81,20 @@ public class StudentService {
   }
 
   /**
-   * 受講生更新とコースの追加登録
+   * 受講生とコース更新
    *
    * @param studentDetail 　受講生詳細
    */
   @Transactional
-  public void update(StudentDetail studentDetail, String courseName) {
+  public void update(StudentDetail studentDetail) {
     //受講生を更新
-    Student student = studentDetail.getStudent();
-    update(student);
-    //コースがあればコースを追加登録する
-    if (!StringUtils.isEmpty(courseName)) {
-      StudentCourses courses = new StudentCourses();
-      courses.setCourseName(courseName);
-      //受講生IDを取得してコース情報に設定してから受講生コース登録
-      courses.setStudentId(student.getId());
-      resister(courses);
+    update(studentDetail.getStudent());
+    //コースを更新する
+    for (StudentCourses courses : studentDetail.getStudentCourses()) {
+      //受講生が削除されていないときのみ更新
+      if (!studentDetail.getStudent().isDeleteFlag()) {
+        update(courses);
+      }
     }
   }
 
@@ -120,6 +123,15 @@ public class StudentService {
    */
   private void update(Student student) {
     this.repository.updateStudent(student);
+  }
+
+  /**
+   * 受講生コース更新
+   *
+   * @param courses 　受講生コース
+   */
+  private void update(StudentCourses courses) {
+    this.repository.updateStudentCourses(courses);
   }
 
 
