@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import management.student.converter.StudentConverter;
 import management.student.data.Student;
-import management.student.data.StudentCourses;
+import management.student.data.StudentCourse;
 import management.student.domain.StudentDetail;
 import management.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +36,9 @@ public class StudentService {
    */
   public List<StudentDetail> getStudentList() {
     //受講生全件取得
-    List<Student> studentList = this.repository.searchStudents();
+    List<Student> studentList = this.repository.searchStudentList();
     // 受講生コース全件取得
-    List<StudentCourses> studentCoursesList = this.repository.searchCourses();
+    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseList();
     //コンバータークラスで欲しい情報に変換
     return this.converter.convertStudentDetails(studentList, studentCoursesList);
   }
@@ -53,7 +53,7 @@ public class StudentService {
    */
   public StudentDetail getStudent(int id) {
     Student student = this.repository.searchStudentByID(id);
-    List<StudentCourses> courses = this.repository.searchStudentCourseByID(student.getId());
+    List<StudentCourse> courses = this.repository.searchStudentCourseByID(student.getId());
     return new StudentDetail(student, courses);
   }
 
@@ -63,8 +63,8 @@ public class StudentService {
    *
    * @return String 受講生情報
    */
-  public List<StudentCourses> getStudentCourseList() {
-    return this.repository.searchCourses();
+  public List<StudentCourse> getStudentCourseList() {
+    return this.repository.searchStudentCourseList();
   }
 
   /**
@@ -72,13 +72,14 @@ public class StudentService {
    *
    * @return String 受講生コース
    */
-  public List<StudentCourses> getStudentCourses(int studentId) {
+  public List<StudentCourse> getStudentCourses(int studentId) {
     return this.repository.searchStudentCourseByID(studentId);
   }
 
   /**
-   * 受講生と受講生コース登録
-   * 受講生コースには受講生登録の後に受講生IDを設定して登録する
+   * 受講生詳細の登録
+   * 受講生と受講生コースをそれぞれ登録する
+   * 受講生コースには受講生登録の後に紐づく受講生ID、コース開始日、コース終了日を設定して登録する
    *
    * @param studentDetail 　受講生詳細
    */
@@ -86,18 +87,18 @@ public class StudentService {
   public StudentDetail register(StudentDetail studentDetail) {
     //受講生を登録
     Student student = studentDetail.getStudent();
-    StudentCourses courses = studentDetail.getStudentCourses().getFirst();
     //@Optionを指定しているので、登録時にstudentにIDが設定される
     resister(student);
-    //受講生IDを取得してコース情報に設定してから受講生コース登録
-    courses.setStudentId(student.getId());
-    // startDateは現在の日付、endDateは１年後を設定
-    LocalDateTime today = LocalDateTime.now();
-    courses.setStartDate(today);
-    courses.setEndDate(today.plusYears(1)); // 1年後の日付を設定
-    resister(courses);
+    List<StudentCourse> courses = studentDetail.getStudentCourseList();
+    //受講生コースのループを回して受講生コースに初期値を設定
+    courses.forEach(studentCourses -> {
+      initStudentCourses(studentCourses, student);
+      //受講生コース登録
+      resister(studentCourses);
+    });
     return studentDetail;
   }
+
 
   /**
    * 受講生と受講生コース更新
@@ -109,16 +110,28 @@ public class StudentService {
     //受講生を更新
     update(studentDetail.getStudent());
     //コースを更新する
-    for (StudentCourses courses : studentDetail.getStudentCourses()) {
-      //受講生が削除されていないときのみ更新
-      if (!studentDetail.getStudent().isDeleteFlag()) {
-        update(courses);
-      }
-    }
+    //受講生が削除されていないときのみ更新
+    studentDetail.getStudentCourseList().stream()
+        .filter(courses -> !studentDetail.getStudent().isDeleteFlag()).forEach(this::update);
+  }
+
+  /**
+   * 受講生コースに紐づく受講生ID,コース開始日、コース終了日を設定する
+   *
+   * @param courses 　受講生コース
+   * @param student 　受講生
+   */
+  private static void initStudentCourses(StudentCourse courses, Student student) {
+    courses.setStudentId(student.getId());
+    // startDateは現在の日付、endDateは１年後を設定
+    LocalDateTime today = LocalDateTime.now();
+    courses.setStartDate(today);
+    courses.setEndDate(today.plusYears(1)); // 1年後の日付を設定
   }
 
   /**
    * 受講生登録
+   * 　IDは自動採番
    *
    * @param student 　受講生
    */
@@ -131,7 +144,7 @@ public class StudentService {
    *
    * @param courses 受講生コース
    */
-  private void resister(StudentCourses courses) {
+  private void resister(StudentCourse courses) {
     this.repository.createStudentCourse(courses);
   }
 
@@ -149,7 +162,7 @@ public class StudentService {
    *
    * @param courses 　受講生コース
    */
-  private void update(StudentCourses courses) {
-    this.repository.updateStudentCourses(courses);
+  private void update(StudentCourse courses) {
+    this.repository.updateStudentCourse(courses);
   }
 }

@@ -1,9 +1,7 @@
 package management.student.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import management.student.converter.StudentConverter;
-import management.student.data.StudentCourses;
 import management.student.domain.StudentDetail;
 import management.student.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +36,7 @@ public class StudentController {
   }
 
   /**
-   * 受講生の情報を取得
+   * 受講生詳細の情報を取得
    * 全件検索のため条件の指定はなし
    *
    * @return String 受講生一覧（全件）
@@ -62,23 +61,7 @@ public class StudentController {
 
 
   /**
-   * 受講生登録用のページの初期表示
-   *
-   * @return String 受講生情報
-   */
-  @GetMapping("/students/new")
-  public String resisterStudent(Model model) {
-    //オブジェクトは空のものを設定しておかないと画面でエラーになる
-    StudentDetail studentDetail = new StudentDetail();
-    // 受講生コースは複数なので、初期表示の場合はタグを表示させるために空の受講生コースオブジェクトを設定
-    studentDetail.setStudentCourses(Arrays.asList(new StudentCourses()));
-    model.addAttribute("studentDetail", studentDetail);
-    return "resisterStudent";
-  }
-
-
-  /**
-   * 受講生の情報を登録
+   * 受講生詳細の情報を登録
    *
    * @return String 受講生情報
    */
@@ -94,7 +77,7 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
-  @PostMapping("/students/update")
+  @PutMapping("/students/update")
   public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
     //受講生更新のサービスのメソッド呼びだし
     this.service.update(studentDetail);
@@ -104,14 +87,4 @@ public class StudentController {
 
   }
 
-
-  /**
-   * 受講生コースの情報を取得
-   *
-   * @return String 受講生情報
-   */
-  @GetMapping("/students/course")
-  public List<StudentCourses> getStudentCourseList() {
-    return this.service.getStudentCourseList();
-  }
 }

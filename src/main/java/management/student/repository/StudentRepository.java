@@ -2,7 +2,7 @@ package management.student.repository;
 
 import java.util.List;
 import management.student.data.Student;
-import management.student.data.StudentCourses;
+import management.student.data.StudentCourse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -18,7 +18,7 @@ public interface StudentRepository {
    * @return 受講生一覧
    */
   @Select("SELECT * FROM student where delete_flag = 0")
-  List<Student> searchStudents();
+  List<Student> searchStudentList();
 
   /**
    * 受講生1件検索
@@ -35,7 +35,7 @@ public interface StudentRepository {
    * @return List<StudentCourses> 受講生コース
    */
   @Select("SELECT * FROM student_courses ")
-  List<StudentCourses> searchCourses();
+  List<StudentCourse> searchStudentCourseList();
 
   /**
    * 受講生コース1件検索
@@ -43,7 +43,7 @@ public interface StudentRepository {
    * @return 受講生
    */
   @Select("SELECT * FROM student_courses where student_id = #{studentId}")
-  List<StudentCourses> searchStudentCourseByID(int studentId);
+  List<StudentCourse> searchStudentCourseByID(int studentId);
 
 
   /**
@@ -56,9 +56,9 @@ public interface StudentRepository {
   /**
    * 受講生コース登録
    *
-   * @param studentCourses 　受講生コース
+   * @param studentCourse 　受講生コース
    */
-  void createStudentCourse(StudentCourses studentCourses);
+  void createStudentCourse(StudentCourse studentCourse);
 
   /**
    * 受講生更新
@@ -72,5 +72,5 @@ public interface StudentRepository {
    *
    * @param courses 　受講生コース
    */
-  void updateStudentCourses(StudentCourses courses);
+  void updateStudentCourse(StudentCourse courses);
 }

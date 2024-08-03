@@ -27,7 +27,7 @@
   </insert>
 
   <!-- 受講生コース登録 -->
-  <insert id="createStudentCourse" parameterType="management.student.data.StudentCourses">
+  <insert id="createStudentCourse" parameterType="management.student.data.StudentCourse">
     INSERT INTO student_courses (
     student_id,
     course_name,
@@ -58,7 +58,7 @@
     WHERE id = #{id}
   </update>
 
-  <update id="updateStudentCourses" parameterType="management.student.data.StudentCourses">
+  <update id="updateStudentCourse" parameterType="management.student.data.StudentCourse">
     UPDATE student_courses
     SET
     course_name = #{courseName}

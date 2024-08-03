@@ -54,7 +54,7 @@
         <td th:text="${studentDetail.student.remarks}">特になし</td>
         <td>
           <!--          複数のコースを受講している場合は複数表示させる-->
-          <span th:each="course, stat : ${studentDetail.studentCourses}">
+          <span th:each="course, stat : ${studentDetail.studentCourse}">
             <span th:text="${course.courseName}"></span><br th:if="${!stat.last}"/>
           </span>
         </td>

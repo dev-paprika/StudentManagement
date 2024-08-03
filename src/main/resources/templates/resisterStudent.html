@@ -67,13 +67,13 @@
       <textarea class="form-control" id="remarks" th:field="*{student.remarks}" rows="3"></textarea>
     </div>
     <!--          複数のコースを受講している場合は複数表示させる-->
-    <div class="form-group" th:each="course, stat : *{studentCourses}">
+    <div class="form-group" th:each="course, stat : *{studentCourse}">
 
       <label for="courseName"
              th:for="studentCourse.__${stat.index}__.courseName">コース名：</label>
       <select class="form-control" id="courseName"
               th:id="studentCourse.__${stat.index}__.courseName"
-              th:field="*{studentCourses[__${stat.index}__].courseName}"
+              th:field="*{studentCourse[__${stat.index}__].courseName}"
               required>
         <option value="" disabled selected>選択してください</option>
         <option value="Java入門">Java入門</option>
