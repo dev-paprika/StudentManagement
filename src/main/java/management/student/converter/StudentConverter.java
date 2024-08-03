@@ -8,11 +8,16 @@ import management.student.data.StudentCourses;
 import management.student.domain.StudentDetail;
 import org.springframework.stereotype.Component;
 
+/**
+ * Serviceから取得したオブジェクト受講生情報と受講生コースの情報を受講生詳細、
+ * もしくはその逆に変換するConverterクラスです
+ */
 @Component
 public class StudentConverter {
 
   /**
    * 受講生テーブルと受講生コーステーブルを使用して、受講生詳細を作成する
+   * 受講生コースは受講生に対して複数存在するのでループを回して受講生IDで紐づく受講生コースを設定する
    *
    * @param students 　受講生
    * @param courses  　受講生コース

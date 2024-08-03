@@ -6,13 +6,16 @@ import management.student.data.StudentCourses;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+/**
+ * 受講生テーブルと受講生詳細テーブルを操作するRepositoryです。
+ */
 @Mapper
 public interface StudentRepository {
 
   /**
    * 受講生全件検索
    *
-   * @return 受講生
+   * @return 受講生一覧
    */
   @Select("SELECT * FROM student where delete_flag = 0")
   List<Student> searchStudents();
@@ -20,7 +23,7 @@ public interface StudentRepository {
   /**
    * 受講生1件検索
    *
-   * @return 受講生
+   * @return 受講生（1件）
    */
   @Select("SELECT * FROM student where id = #{id} AND delete_flag = 0")
   Student searchStudentByID(int id);

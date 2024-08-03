@@ -1,6 +1,7 @@
 package management.student.service;
 
 import java.util.List;
+import management.student.converter.StudentConverter;
 import management.student.data.Student;
 import management.student.data.StudentCourses;
 import management.student.domain.StudentDetail;
@@ -9,39 +10,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 受講生情報を取り扱うサービス
+ * 受講生情報の検索、更新、登録処理を行う
+ */
 @Service
 public class StudentService {
 
   private StudentRepository repository;
+  private StudentConverter converter;
 
   @Autowired
   //コンストラクタにAutowiredする。フィールドにAutowirdeしない
-  public StudentService(StudentRepository repository) {
+  public StudentService(StudentRepository repository, StudentConverter converter) {
     this.repository = repository;
+    this.converter = converter;
   }
 
   /**
-   * 受講生の情報(全件)を取得
+   * 受講生の情報を取得
+   * 全件検索のため条件の指定はなし
    *
    * @return String 受講生情報
    */
-  public List<Student> getStudentList() {
-    return this.repository.searchStudents();
+  public List<StudentDetail> getStudentList() {
+    //受講生全件取得
+    List<Student> studentList = this.repository.searchStudents();
+    // 受講生コース全件取得
+    List<StudentCourses> studentCoursesList = this.repository.searchCourses();
+    //コンバータークラスで欲しい情報に変換
+    return this.converter.convertStudentDetails(studentList, studentCoursesList);
   }
 
   /**
-   * 受講生の情報(1件)を取得
+   * 受講生詳細の情報（1件）を取得
+   * 　IDに基づく任意の受講生情報を取得したあと、その受講生に紐づく受講生コースを取得し、
+   * 　受講生詳細に設定します。
    *
+   * @param id 受講生ID
    * @return String 受講生情報
    */
   public StudentDetail getStudent(int id) {
     Student student = this.repository.searchStudentByID(id);
     List<StudentCourses> courses = this.repository.searchStudentCourseByID(student.getId());
-    StudentDetail studentDetail = new StudentDetail();
-    studentDetail.setStudent(student);
-    studentDetail.setStudentCourses(courses);
-    return studentDetail;
-
+    return new StudentDetail(student, courses);
   }
 
 
@@ -64,12 +76,13 @@ public class StudentService {
   }
 
   /**
-   * 受講生とコース登録
+   * 受講生と受講生コース登録
+   * 受講生コースには受講生登録の後に受講生IDを設定して登録する
    *
    * @param studentDetail 　受講生詳細
    */
   @Transactional
-  public void register(StudentDetail studentDetail) {
+  public StudentDetail register(StudentDetail studentDetail) {
     //受講生を登録
     Student student = studentDetail.getStudent();
     StudentCourses courses = studentDetail.getStudentCourses().getFirst();
@@ -78,10 +91,11 @@ public class StudentService {
     //受講生IDを取得してコース情報に設定してから受講生コース登録
     courses.setStudentId(student.getId());
     resister(courses);
+    return studentDetail;
   }
 
   /**
-   * 受講生とコース更新
+   * 受講生と受講生コース更新
    *
    * @param studentDetail 　受講生詳細
    */
@@ -133,6 +147,4 @@ public class StudentService {
   private void update(StudentCourses courses) {
     this.repository.updateStudentCourses(courses);
   }
-
-
 }
