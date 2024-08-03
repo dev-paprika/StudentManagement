@@ -1,5 +1,6 @@
 package management.student.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import management.student.converter.StudentConverter;
 import management.student.data.Student;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
@@ -40,6 +42,22 @@ public class StudentController {
     return "studentList";
   }
 
+
+  /**
+   * 受講生詳細の情報（1件）を取得
+   *
+   * @return String 受講生情報
+   */
+  @GetMapping("/students/{id}")
+  public String getStudent(@PathVariable String id, Model model) {
+    //受講生と受講生コース情報取得
+    StudentDetail studentDetail = this.service.getStudent(Integer.parseInt(id));
+    // モデルに設定
+    model.addAttribute("studentDetail", studentDetail);
+    return "updateStudent";
+  }
+
+
   /**
    * 受講生登録用のページの初期表示
    *
@@ -48,7 +66,10 @@ public class StudentController {
   @GetMapping("/students/new")
   public String resisterStudent(Model model) {
     //オブジェクトは空のものを設定しておかないと画面でエラーになる
-    model.addAttribute("studentDetail", new StudentDetail());
+    StudentDetail studentDetail = new StudentDetail();
+    // 受講生コースは複数なので、初期表示の場合はタグを表示させるために空の受講生コースオブジェクトを設定
+    studentDetail.setStudentCourses(Arrays.asList(new StudentCourses()));
+    model.addAttribute("studentDetail", studentDetail);
     return "resisterStudent";
   }
 
@@ -65,7 +86,24 @@ public class StudentController {
     }
     //受講生登録のサービスのメソッド呼びだし
     this.service.register(studentDetail);
-    return "redirect:/student";
+    return "redirect:/students";
+  }
+
+  /**
+   * 受講生詳細の情報（1件）を更新
+   *
+   * @return String 受講生情報
+   */
+  @PostMapping("/students/update")
+  public String updateStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
+    //エラーがある場合は返却する
+    if (result.hasErrors()) {
+      return "updateStudent";
+    }
+    //受講生更新のサービスのメソッド呼びだし
+    this.service.update(studentDetail);
+    return "redirect:/students";
+
   }
 
 
