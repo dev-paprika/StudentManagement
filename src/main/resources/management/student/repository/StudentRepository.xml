@@ -36,8 +36,8 @@
     ) VALUES (
     #{studentId},
     #{courseName},
-    CURRENT_TIMESTAMP(),
-    DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 1 YEAR)
+    #{startDate},
+    #{endDate}
     )
   </insert>
 

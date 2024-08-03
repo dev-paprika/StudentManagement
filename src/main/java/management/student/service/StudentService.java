@@ -1,5 +1,6 @@
 package management.student.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import management.student.converter.StudentConverter;
 import management.student.data.Student;
@@ -90,6 +91,10 @@ public class StudentService {
     resister(student);
     //受講生IDを取得してコース情報に設定してから受講生コース登録
     courses.setStudentId(student.getId());
+    // startDateは現在の日付、endDateは１年後を設定
+    LocalDateTime today = LocalDateTime.now();
+    courses.setStartDate(today);
+    courses.setEndDate(today.plusYears(1)); // 1年後の日付を設定
     resister(courses);
     return studentDetail;
   }

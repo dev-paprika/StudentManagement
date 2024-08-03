@@ -1,6 +1,6 @@
 package management.student.data;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +11,7 @@ public class StudentCourses {
   private int id;                    //id
   private int studentId;      //受講生id
   private String courseName; // コース名
-  private Timestamp startDate;    //受講開始日
-  private Timestamp endDate;     //受講完了日
+  private LocalDateTime startDate;    //受講開始日
+  private LocalDateTime endDate;     //受講完了日
 
 }
