@@ -4,7 +4,6 @@ import java.util.List;
 import management.student.data.Student;
 import management.student.data.StudentCourse;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
 
 /**
  * 受講生テーブルと受講生詳細テーブルを操作するRepositoryです。
@@ -17,7 +16,6 @@ public interface StudentRepository {
    *
    * @return 受講生一覧
    */
-  @Select("SELECT * FROM student where delete_flag = 0")
   List<Student> searchStudentList();
 
   /**
@@ -25,7 +23,6 @@ public interface StudentRepository {
    *
    * @return 受講生（1件）
    */
-  @Select("SELECT * FROM student where id = #{id} AND delete_flag = 0")
   Student searchStudentByID(int id);
 
 
@@ -34,7 +31,6 @@ public interface StudentRepository {
    *
    * @return List<StudentCourses> 受講生コース
    */
-  @Select("SELECT * FROM student_courses ")
   List<StudentCourse> searchStudentCourseList();
 
   /**
@@ -42,7 +38,6 @@ public interface StudentRepository {
    *
    * @return 受講生
    */
-  @Select("SELECT * FROM student_courses where student_id = #{studentId}")
   List<StudentCourse> searchStudentCourseByID(int studentId);
 
 

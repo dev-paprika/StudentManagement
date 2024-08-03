@@ -8,6 +8,27 @@
     name, furigana, nickname, age, phone_number, gender, remarks, email, region
   </sql>
 
+  <!-- 受講生全件検索 -->
+  <select id="searchStudentList" resultType="management.student.data.Student">
+    SELECT * FROM student WHERE delete_flag = 0
+  </select>
+
+  <!-- 受講生1件検索 -->
+  <select id="searchStudentByID" parameterType="int" resultType="management.student.data.Student">
+    SELECT * FROM student WHERE id = #{id} AND delete_flag = 0
+  </select>
+
+  <!-- 受講生コース全件検索 -->
+  <select id="searchStudentCourseList" resultType="management.student.data.StudentCourse">
+    SELECT * FROM student_courses
+  </select>
+
+  <!-- 受講生コース1件検索 -->
+  <select id="searchStudentCourseByID" parameterType="int"
+    resultType="management.student.data.StudentCourse">
+    SELECT * FROM student_courses WHERE student_id = #{studentId}
+  </select>
+
   <!-- 受講生登録 -->
   <insert id="createStudent" parameterType="management.student.data.Student" useGeneratedKeys="true"
     keyProperty="id">
