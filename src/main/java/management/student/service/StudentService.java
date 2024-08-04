@@ -6,8 +6,10 @@ import management.student.converter.StudentConverter;
 import management.student.data.Student;
 import management.student.data.StudentCourse;
 import management.student.domain.StudentDetail;
+import management.student.exception.StudentBizException;
 import management.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +54,10 @@ public class StudentService {
    * @return String 受講生情報
    */
   public StudentDetail getStudent(int id) {
-    Student student = this.repository.searchStudentByID(id);
+    //該当の受講生が存在しない場合はエラーとする。
+    Student student = this.repository.searchStudentByID(id)
+        .orElseThrow(() -> new StudentBizException("Student with ID " + id + " not found",
+            HttpStatus.NOT_FOUND));
     List<StudentCourse> courses = this.repository.searchStudentCourseByID(student.getId());
     return new StudentDetail(student, courses);
   }

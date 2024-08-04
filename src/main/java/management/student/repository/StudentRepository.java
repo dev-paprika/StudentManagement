@@ -1,6 +1,7 @@
 package management.student.repository;
 
 import java.util.List;
+import java.util.Optional;
 import management.student.data.Student;
 import management.student.data.StudentCourse;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,7 +24,7 @@ public interface StudentRepository {
    *
    * @return 受講生（1件）
    */
-  Student searchStudentByID(int id);
+  Optional<Student> searchStudentByID(int id);
 
 
   /**
