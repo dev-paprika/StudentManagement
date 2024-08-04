@@ -3,27 +3,33 @@ package management.student.controller;
 import java.util.Arrays;
 import java.util.List;
 import management.student.converter.StudentConverter;
-import management.student.data.Student;
 import management.student.data.StudentCourses;
 import management.student.domain.StudentDetail;
 import management.student.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * 受講生の情報を操作（検索・登録・更新）するREST　APIが実行されるControllerクラス
+ */
 @RestController
 public class StudentController {
 
   private StudentService service;
   private StudentConverter converter;
 
+  /**
+   * 引数２つコンストラクタ
+   *
+   * @param service   受講生の操作に関わるサービス
+   * @param converter 　受講生コースと受講生を受講生詳細にコンバートするためのクラス
+   */
   @Autowired
   public StudentController(StudentService service, StudentConverter converter) {
     this.service = service;
@@ -32,31 +38,26 @@ public class StudentController {
 
   /**
    * 受講生の情報を取得
+   * 全件検索のため条件の指定はなし
    *
-   * @return String 受講生情報
+   * @return String 受講生一覧（全件）
    */
   @GetMapping("/students")
   public List<StudentDetail> getStudentList() {
-    List<Student> students = this.service.getStudentList();
-    List<StudentCourses> courses = this.service.getStudentCourseList();
-    // コンバートしてモデルに設定
-    return converter.convertStudentDetails(students, courses);
-
+    return this.service.getStudentList();
   }
 
 
   /**
    * 受講生詳細の情報（1件）を取得
+   * 　IDに基づく任意の受講生情報を返します。
    *
-   * @return String 受講生情報
+   * @return String 受講生情報（１件）
    */
   @GetMapping("/students/{id}")
-  public String getStudent(@PathVariable String id, Model model) {
+  public StudentDetail getStudent(@PathVariable String id, Model model) {
     //受講生と受講生コース情報取得
-    StudentDetail studentDetail = this.service.getStudent(Integer.parseInt(id));
-    // モデルに設定
-    model.addAttribute("studentDetail", studentDetail);
-    return "updateStudent";
+    return service.getStudent(Integer.parseInt(id));
   }
 
 
@@ -82,13 +83,10 @@ public class StudentController {
    * @return String 受講生情報
    */
   @PostMapping("/students")
-  public String resisterStudent(@ModelAttribute StudentDetail studentDetail, BindingResult result) {
-    if (result.hasErrors()) {
-      return "resisterStudent";
-    }
+  public ResponseEntity<StudentDetail> resisterStudent(@RequestBody StudentDetail studentDetail) {
     //受講生登録のサービスのメソッド呼びだし
-    this.service.register(studentDetail);
-    return "redirect:/students";
+    StudentDetail responseStudentDetail = this.service.register(studentDetail);
+    return ResponseEntity.ok(responseStudentDetail);
   }
 
   /**
