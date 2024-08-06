@@ -1,7 +1,10 @@
 package management.student.service;
 
+import static java.util.function.Predicate.not;
+
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import management.student.converter.StudentConverter;
 import management.student.data.Student;
 import management.student.data.StudentCourse;
@@ -113,9 +116,11 @@ public class StudentService {
   @Transactional
   public void update(StudentDetail studentDetail) {
     //受講生を更新
+    StudentDetail beforeStudentDetail = this.getStudent(studentDetail.getStudent().getId());
+    //更新時に入力が入っている値だけを更新し、他の値は元の受講生の値を利用する。
+    mergedStudent(beforeStudentDetail, studentDetail);
     update(studentDetail.getStudent());
-    //コースを更新する
-    //受講生が削除されていないときのみ更新
+    //受講生コースを受講生が削除されていないときのみ更新
     studentDetail.getStudentCourseList().stream()
         .filter(courses -> !studentDetail.getStudent().isDeleteFlag()).forEach(this::update);
   }
@@ -169,5 +174,36 @@ public class StudentService {
    */
   private void update(StudentCourse courses) {
     this.repository.updateStudentCourse(courses);
+  }
+
+  /**
+   * 　更新用の受講生のフィールドに値が入っているかどうか判定し、設定されいなければ、元の受講生の値を設定する
+   *
+   * @param existingStudentDetail 受講生詳細（更新用）
+   * @param updatesStudentDetail  　受講生詳細（更新前）
+   */
+  private static void mergedStudent(StudentDetail existingStudentDetail,
+      StudentDetail updatesStudentDetail) {
+    Student existing = existingStudentDetail.getStudent();
+    Student updates = updatesStudentDetail.getStudent();
+    Student mergedStudent = new Student();
+
+    mergedStudent.setName(Optional.ofNullable(updates.getName()).filter(not(String::isBlank))
+        .orElse(existing.getName()));
+    mergedStudent.setAge(updates.getAge() > 0 ? updates.getAge() : existing.getAge());
+    mergedStudent.setGender(Optional.ofNullable(updates.getGender()).orElse(existing.getGender()));
+    mergedStudent.setFurigana(
+        Optional.ofNullable(updates.getFurigana()).filter(not(String::isBlank))
+            .orElse(existing.getFurigana()));
+    mergedStudent.setNickname(
+        Optional.ofNullable(updates.getNickname()).orElse(existing.getNickname()));
+    mergedStudent.setPhoneNumber(
+        Optional.ofNullable(updates.getPhoneNumber()).filter(not(String::isBlank))
+            .orElse(existing.getPhoneNumber()));
+    mergedStudent.setEmail(Optional.ofNullable(updates.getEmail()).orElse(existing.getEmail()));
+    mergedStudent.setRegion(Optional.ofNullable(updates.getRegion()).orElse(existing.getRegion()));
+    mergedStudent.setRemarks(
+        Optional.ofNullable(updates.getRemarks()).orElse(existing.getRemarks()));
+    existingStudentDetail.setStudent(mergedStudent);
   }
 }
