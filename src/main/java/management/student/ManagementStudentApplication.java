@@ -16,7 +16,6 @@ public class ManagementStudentApplication {
   @Autowired
   //Springが管理しているインスタンスをメンバ変数に入れてくれる（自動で紐づけしますよ。）
   private StudentRepository repository;
-  private final Map<String, String> studentMap = new HashMap<>(); //受講生の情報
 
   public static void main(String[] args) {
     SpringApplication.run(ManagementStudentApplication.class, args);

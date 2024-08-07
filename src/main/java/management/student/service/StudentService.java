@@ -187,7 +187,7 @@ public class StudentService {
     Student existing = existingStudentDetail.getStudent();
     Student updates = updatesStudentDetail.getStudent();
     Student mergedStudent = new Student();
-
+    mergedStudent.setId(updates.getId());
     mergedStudent.setName(Optional.ofNullable(updates.getName()).filter(not(String::isBlank))
         .orElse(existing.getName()));
     mergedStudent.setAge(updates.getAge() > 0 ? updates.getAge() : existing.getAge());
@@ -204,6 +204,6 @@ public class StudentService {
     mergedStudent.setRegion(Optional.ofNullable(updates.getRegion()).orElse(existing.getRegion()));
     mergedStudent.setRemarks(
         Optional.ofNullable(updates.getRemarks()).orElse(existing.getRemarks()));
-    existingStudentDetail.setStudent(mergedStudent);
+    updatesStudentDetail.setStudent(mergedStudent);
   }
 }
