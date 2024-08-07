@@ -1,5 +1,9 @@
 package management.student.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -45,6 +49,18 @@ public class StudentController {
    *
    * @return String 受講生一覧（全件）
    */
+  @Operation(
+      summary = "全受講生情報の取得",
+      description = "データベースに登録されている全受講生の詳細情報を取得します。",
+      responses = {
+          @ApiResponse(
+              responseCode = "200",
+              description = "成功 - 全受講生の情報を返します",
+              content = @Content(mediaType = "application/json",
+                  schema = @Schema(implementation = List.class))
+          )
+      }
+  )
   @GetMapping("/students")
   public List<StudentDetail> getStudentList() {
     return this.service.getStudentList();
@@ -57,6 +73,22 @@ public class StudentController {
    *
    * @return String 受講生情報（１件）
    */
+  @Operation(
+      summary = "IDに基づく受講生情報の取得",
+      description = "指定されたIDに基づいて受講生の詳細情報を取得します。",
+      responses = {
+          @ApiResponse(
+              responseCode = "200",
+              description = "成功 - 指定された受講生の情報を返します",
+              content = @Content(mediaType = "application/json",
+                  schema = @Schema(implementation = StudentDetail.class))
+          ),
+          @ApiResponse(
+              responseCode = "404",
+              description = "受講生が見つかりません"
+          )
+      }
+  )
   @GetMapping("/students/{id}")
   public StudentDetail getStudent(@PathVariable @Valid @Min(1) @Max(999) String id) {
     //受講生と受講生コース情報取得
@@ -69,6 +101,18 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
+  @Operation(
+      summary = "新しい受講生の登録",
+      description = "新しい受講生情報をデータベースに登録します。",
+      responses = {
+          @ApiResponse(
+              responseCode = "201",
+              description = "受講生が正常に登録されました。",
+              content = @Content(mediaType = "application/json",
+                  schema = @Schema(implementation = StudentDetail.class))
+          )
+      }
+  )
   @PostMapping("/students")
   public ResponseEntity<StudentDetail> resisterStudent(
       @Valid @RequestBody StudentDetail studentDetail) {
@@ -82,6 +126,21 @@ public class StudentController {
    *
    * @return String 受講生情報
    */
+  @Operation(
+      summary = "受講生情報の更新",
+      description = "指定された受講生情報を更新します。",
+      responses = {
+          @ApiResponse(
+              responseCode = "200",
+              description = "受講生情報が正常に更新されました。",
+              content = @Content(mediaType = "application/json")
+          ),
+          @ApiResponse(
+              responseCode = "400",
+              description = "リクエストデータが不正です。"
+          )
+      }
+  )
   @PutMapping("/students/update")
   public ResponseEntity<String> updateStudent(@Valid @RequestBody StudentDetail studentDetail) {
     //受講生更新のサービスのメソッド呼びだし
