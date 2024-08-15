@@ -131,7 +131,7 @@ public class StudentService {
    * @param courses 　受講生コース
    * @param student 　受講生
    */
-  private static void initStudentCourses(StudentCourse courses, Student student) {
+  void initStudentCourses(StudentCourse courses, Student student) {
     courses.setStudentId(student.getId());
     // startDateは現在の日付、endDateは１年後を設定
     LocalDateTime today = LocalDateTime.now();
