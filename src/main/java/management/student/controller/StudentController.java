@@ -11,6 +11,8 @@ import java.util.List;
 import management.student.converter.StudentConverter;
 import management.student.domain.StudentDetail;
 import management.student.service.StudentService;
+import management.student.validation.OnCreate;
+import management.student.validation.OnUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -115,7 +117,7 @@ public class StudentController {
   )
   @PostMapping("/students")
   public ResponseEntity<StudentDetail> resisterStudent(
-      @Valid @RequestBody StudentDetail studentDetail) {
+      @Validated(OnCreate.class) @RequestBody StudentDetail studentDetail) {
     //受講生登録のサービスのメソッド呼びだし
     StudentDetail responseStudentDetail = this.service.register(studentDetail);
     return ResponseEntity.ok(responseStudentDetail);
@@ -142,7 +144,8 @@ public class StudentController {
       }
   )
   @PutMapping("/students/update")
-  public ResponseEntity<String> updateStudent(@Valid @RequestBody StudentDetail studentDetail) {
+  public ResponseEntity<String> updateStudent(
+      @Validated(OnUpdate.class) @RequestBody StudentDetail studentDetail) {
     //受講生更新のサービスのメソッド呼びだし
     this.service.update(studentDetail);
     // ResponseEntityで何を返すか設定する

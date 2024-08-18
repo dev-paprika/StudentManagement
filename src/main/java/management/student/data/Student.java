@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import management.student.validation.OnCreate;
+import management.student.validation.OnUpdate;
 
 @Schema(description = "受講生")
 @Setter
@@ -17,7 +18,7 @@ public class Student {
   private int id; //id
   @NotEmpty(message = "名前は必須です", groups = OnCreate.class)
   private String name; //名前
-  @NotEmpty(groups = OnCreate.class)
+  @NotNull(groups = OnCreate.class)
   private int age; //年齢
   @NotNull(groups = OnCreate.class)
   private String furigana;  //かな
@@ -26,13 +27,15 @@ public class Student {
   @NotNull(groups = OnCreate.class)
   private String nickname;  //ニックネーム
   @NotEmpty(groups = OnCreate.class)
-  @Email(message = "メールアドレスが有効ではありません。")
+  @Email(message = "メールアドレスが有効ではありません。",
+      groups = {OnCreate.class, OnUpdate.class})
   private String email;   //e-mail
   @NotNull(groups = OnCreate.class)
   private String region;    //地域
   @NotEmpty(groups = OnCreate.class)
   @Pattern(regexp = "^\\d{11}$|^\\d{3}-\\d{4}-\\d{4}$",
-      message = "電話番号は数字11桁またはハイフン含む13桁で入力してください")
+      message = "電話番号は数字11桁またはハイフン含む13桁で入力してください",
+      groups = {OnCreate.class, OnUpdate.class})
   private String phoneNumber;  //電話番号
   @NotNull(groups = OnCreate.class)
   private String remarks; //備考
