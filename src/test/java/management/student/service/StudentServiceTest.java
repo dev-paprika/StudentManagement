@@ -66,7 +66,6 @@ class StudentServiceTest {
   void 受講生詳細の情報取得_正しいIDで受講生が取得できること() {
     int testId = 1;
     Student mockStudent = new Student();
-    mockStudent.setId(testId);
     List<StudentCourse> mockCourses = new ArrayList<>();
 
     when(repository.searchStudentByID(testId)).thenReturn(Optional.of(mockStudent));
@@ -76,6 +75,7 @@ class StudentServiceTest {
     StudentDetail result = sut.getStudent(testId);
     //検証
     assertNotNull(result);
+    // 同じ生徒であることを確認する
     assertEquals(mockStudent, result.getStudent());
     assertEquals(mockCourses, result.getStudentCourseList());
     // 必ず１回呼び出されていることを確認する
