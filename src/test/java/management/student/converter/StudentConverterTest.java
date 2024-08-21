@@ -82,6 +82,7 @@ class StudentConverterTest {
     Student student = new Student();
     student.setId(1);
     student.setGender("male");
+    student.setFurigana("ヨシダ　タカハシ");
     student.setNickname("ニック");
     student.setName("Yoshida Takashi");
     student.setEmail("test@sample.com");

@@ -36,9 +36,14 @@ dependencies {
     //MyBatis
     implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '3.0.3'
     implementation group: 'org.mybatis', name: 'mybatis-typehandlers-jsr310', version: '1.0.2'
-
+    // APIサーバー(Tomcat)
     providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+    // for Spring Boot test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // for repository test
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
+    // for test database
+    testImplementation 'com.h2database:h2:2.2.224'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
