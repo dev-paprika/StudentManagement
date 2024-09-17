@@ -153,9 +153,13 @@ public class StudentService {
     update(studentDetail.getStudent());
     //受講生コースを受講生が削除されていないときのみ更新
     if (!studentDetail.getStudent().isDeleteFlag()) {
-      for (StudentCourse course : studentDetail.getStudentCourseList()) {
-        update(course);
-      }
+      studentDetail.getStudentCourseList().forEach(courseWithStatus -> {
+        // コースを更新
+        update(courseWithStatus);
+        // 申込状況更新
+        ApplicationStatus status = courseWithStatus.getApplicationStatus();
+        update(status);
+      });
     }
   }
 

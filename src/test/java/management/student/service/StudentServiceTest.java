@@ -111,7 +111,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生情報の更新が正しく行われること() {
+  void 受講生情報の更新時に受講生コースが設定されていないときにリポジトリから更新メソッドが呼び出されること() {
 
     mockStudent.setName("Original Name");
 
@@ -131,6 +131,40 @@ class StudentServiceTest {
     verify(repository, times(1)).updateStudent(any(Student.class));
     verify(repository, never()).updateStudentCourse(
         any(StudentCourse.class)); // Assuming no courses to update
+  }
+
+  @Test
+  void 受講生情報に受講生コースが設定されているときにリポジトリから更新メソッドが呼び出されること() {
+
+    mockStudent.setName("Original Name");
+    mockStudent.setId(1);
+
+    Student updateStudent = new Student();
+    updateStudent.setId(1);
+    updateStudent.setName("Updated Name");
+    mockCourse.setStudentId(1);
+    mockCourse.setId(1);
+    mockStatus.setStudentCourseId(1);
+    mockStatus.setId(1);
+    mockCourse.setApplicationStatus(mockStatus);
+    List<StudentCourse> courseList = new ArrayList<>();
+    courseList.add(mockCourse);
+
+    StudentDetail originalDetail = new StudentDetail(mockStudent, courseList);
+    StudentDetail updateDetail = new StudentDetail(updateStudent, courseList);
+    //呼び出したときの戻り値が何を返ってくるか指定する
+    //こうすることで、実際にDBアクセスをすることなく検証が行える
+    // Optionalはnull対応するときに便利
+    when(repository.searchStudentByID(1)).thenReturn(Optional.of(mockStudent));
+    when(repository.searchApplicationStatusByID(1)).thenReturn(Optional.of(mockStatus));
+
+    sut.update(updateDetail);
+
+    verify(repository, times(1)).updateStudent(any(Student.class));
+    verify(repository, times(1)).updateStudentCourse(
+        any(StudentCourse.class));
+    verify(repository, times(1)).updateApplicationStatus(
+        any(ApplicationStatus.class));
   }
 
   @Test
