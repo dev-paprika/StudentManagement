@@ -17,11 +17,12 @@ public class StudentConverter {
 
   /**
    * 受講生テーブルと受講生コーステーブルを使用して、受講生詳細を作成する
-   * 受講生コースは受講生に対して複数存在するのでループを回して受講生IDで紐づく受講生コースを設定する
+   * 受講生コースは受講生に対して複数存在するのでループを回して受講生IDで紐づく受講生コースとコースの申込状況を設定する
    *
    * @param studentList 　受講生
    * @param courseList  　受講生コース
    * @return 受講生詳細情報
+   * @Param applicationStatusList 申込状況リスト
    */
   public List<StudentDetail> convertStudentDetails(List<Student> studentList,
       List<StudentCourse> courseList) {
