@@ -56,10 +56,10 @@ class StudentControllerTest {
   StudentConverter converter;  // StudentConverterをモック化
 
   @MockBean
-  private OnCreate onCreate;
+  private OnCreate onCreate;  // 受講生登録用バリデーションのインターフェース
 
   @MockBean
-  private OnUpdate onUpdate;
+  private OnUpdate onUpdate;  // 受講生更新用バリデーションのインターフェース
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -92,7 +92,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 受講生の一覧情報が検索できて返ってくること() throws Exception {
+  void 受講生詳細の一覧情報が正常に取得できること() throws Exception {
     when(service.getStudentList()).thenReturn(List.of(new StudentDetail()));
     mockMvc.perform(get("/students"))
         .andExpect(status().isOk());
@@ -102,7 +102,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 申込状況の一覧情報が検索できて返ってくること() throws Exception {
+  void 申込状況の一覧情報が正常に取得できること() throws Exception {
     when(service.getApplicationStatusList()).thenReturn(List.of(new ApplicationStatus()));
     mockMvc.perform(get("/applicationStatuses"))
         .andExpect(status().isOk());
@@ -112,25 +112,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 受講生詳細の受講生で正常な値を設定したときにエラーにならないこと() {
-    Student student = new Student();
-    student.setFurigana("satou");
-    student.setRegion("大阪");
-    student.setEmail("sample@gmail.com");
-    student.setGender("male");
-    student.setNickname("sttaha");
-    student.setPhoneNumber("09011111111");
-    student.setName("佐藤");
-    student.setRemarks("");
-
-    Set<ConstraintViolation<Student>> violations = validator.validate(student, OnCreate.class);
-//    Assertions.assertEquals(0, violations.size());
-    assertThat(violations.size()).isEqualTo(0);
-
-  }
-
-  @Test
-  void 受講生詳細の受講生で電話番号が不正なときにチェックにひっかかること() {
+  void 受講生詳細の登録時に不正なデータが設定された場合にバリデーションエラーが発生すること() {
     Student student = new Student();
     student.setFurigana("satou");
     student.setRegion("大阪");
@@ -164,13 +146,13 @@ class StudentControllerTest {
   }
 
   @Test
-  void 異常なIDでバリデーションエラーが発生すること() throws Exception {
+  void 不正なIDで受講生情報取得時にバリデーションエラーが発生すること() throws Exception {
     mockMvc.perform(get("/students/1000")) // 1000は @Max(999) を超えているため異常値
         .andExpect(status().isBadRequest());
   }
 
   @Test
-  void 正常なIDで任意の申込状況が取得できること() throws Exception {
+  void 正常なIDで申込状況が取得できること() throws Exception {
     ApplicationStatus applicationStatus = new ApplicationStatus();
     applicationStatus.setId(1);
     when(service.getApplicationStatusById(1)).thenReturn(applicationStatus);
@@ -182,13 +164,13 @@ class StudentControllerTest {
   }
 
   @Test
-  void 申込状況取得時に異常なIDで申込状況バリデーションエラーが発生すること() throws Exception {
+  void 不正なIDで申込状況取得時にバリデーションエラーが発生すること() throws Exception {
     mockMvc.perform(get("/applicationStatuses/1000"))
         .andExpect(status().isBadRequest());
   }
 
   @Test
-  void 存在しないIDで申込状況が取得できない場合に404エラーが発生すること() throws Exception {
+  void 存在しないIDで申込状況取得時に404エラーが発生すること() throws Exception {
     int testId = 999;
 
     // サービスクラスのメソッドが例外をスローすることをモックで設定
@@ -204,7 +186,7 @@ class StudentControllerTest {
 
 
   @Test
-  void 正常なデータをPOSTしたときに成功すること() throws Exception {
+  void 受講生詳細の登録時に正常な値でPOSTリクエストが成功すること() throws Exception {
     Student student = createValidStudent();
     StudentDetail studentDetail = new StudentDetail(student,
         List.of(new StudentCourse()));
@@ -220,7 +202,7 @@ class StudentControllerTest {
 
 
   @Test
-  void 正常なデータをPUTしたときに成功すること() throws Exception {
+  void 受講生詳細の更新時に正常な値でPUTリクエストが成功すること() throws Exception {
 
     mockMvc.perform(put("/students/update")
             .contentType(MediaType.APPLICATION_JSON)
@@ -231,7 +213,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 正常なデータで新しい申込状況が正常に登録されること() throws Exception {
+  void 申込状況の登録時に正常な値でPOSTリクエストで成功すること() throws Exception {
     ApplicationStatus newStatus = new ApplicationStatus();
     newStatus.setId(1);
     newStatus.setStatus("本申込");
@@ -248,7 +230,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 申込状況の登録時に必須項目が欠落してバリデーションエラーが発生すること() throws Exception {
+  void 申込状況の登録時にデータが不正な場合にPOSTリクエストがエラーになること() throws Exception {
     ApplicationStatus invalidStatus = new ApplicationStatus();
     invalidStatus.setId(1);
     // studentCourseId と status が不正
@@ -288,7 +270,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 申込状況が正常に更新されること() throws Exception {
+  void 申込状況の更新時に正常な値でPUTリクエストが成功すること() throws Exception {
     ApplicationStatus updatedStatus = new ApplicationStatus();
     updatedStatus.setId(1);
     updatedStatus.setStudentCourseId(1);
@@ -303,7 +285,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 存在しない申込状況の更新時に404エラーが発生すること() throws Exception {
+  void 存在しない申込状況IDの更新時に404エラーが発生すること() throws Exception {
     int testId = 999;
     ApplicationStatus updateStatus = new ApplicationStatus();
     updateStatus.setId(testId);
@@ -349,7 +331,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 申込状況が正常に削除されること() throws Exception {
+  void 申込状況がDELETEリクエストで正常に削除されること() throws Exception {
     // 実行
     mockMvc.perform(delete("/applicationStatuses/1"))
         .andExpect(status().isOk());
@@ -358,7 +340,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 存在しない申込状況の削除時に404エラーが発生すること() throws Exception {
+  void 存在しない申込状況IDの削除時に404エラーが発生すること() throws Exception {
     int testId = 999;
     // searchApplicationStatusByID メソッドが Optional.empty() を返すようにモック設定
     when(repository.searchApplicationStatusByID(testId)).thenReturn(Optional.empty());
@@ -391,7 +373,7 @@ class StudentControllerTest {
 
   //以下バリデーションチェック
   @Test
-  void 受講生登録時に名前が入力されていないときにエラーとなること() {
+  void 受講生登録時に名前が未入力でエラーとなること() {
     Student student = createValidStudent();
     student.setName(""); // 名前を空にする
 
@@ -439,7 +421,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 受講生登録時に不正な地域が入力されたときにエラーとなること() {
+  void 受講生登録時に不正な地域でエラーとなること() {
     Student student = createValidStudent();
     student.setRegion(null); // 地域をnullにする
 
@@ -451,7 +433,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 受講生登録時に不正なニックネームが入力されたときにエラーとなること() {
+  void 受講生登録時に不正なニックネームでエラーとなること() {
     Student student = createValidStudent();
     student.setNickname(null); // ニックネームをnullにする
 
@@ -464,7 +446,7 @@ class StudentControllerTest {
 
   //　申込状況のバリデーションチェック
   @Test
-  void 申込状況登録で受講生IDが設定されていない場合にエラーになること() {
+  void 申込状況の登録時に受講生IDが未設定でエラーになること() {
     ApplicationStatus status = new ApplicationStatus();
     status.setId(1);
     status.setStatus("本申込");
@@ -477,7 +459,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 申込状況登録で受講生IDが不正な場合にエラーになること() {
+  void 申込状況の登録時と更新時で受講生IDが不正な場合にエラーになること() {
     ApplicationStatus status = new ApplicationStatus();
     status.setId(1);
     status.setId(-2);
@@ -491,7 +473,7 @@ class StudentControllerTest {
   }
 
   @Test
-  void 申込状況登録と更新で申込ステータスが不正な場合にエラーになること() {
+  void 申込状況の登録時と更新時で申込ステータスが不正な場合にエラーになること() {
     ApplicationStatus status = new ApplicationStatus();
     status.setId(1);
     status.setStudentCourseId(1);
@@ -503,6 +485,11 @@ class StudentControllerTest {
         .containsOnly("ステータスは必須です");
   }
 
+  /**
+   * バリデート用の受講生データを作成する
+   *
+   * @return Student 受講生
+   */
   private Student createValidStudent() {
     Student student = new Student();
     student.setId(1);

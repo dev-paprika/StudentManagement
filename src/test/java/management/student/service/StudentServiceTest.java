@@ -59,7 +59,7 @@ class StudentServiceTest {
 
 
   @Test
-  void 受講生詳細の一覧検索_リポジトリの呼び出しができていてコンバータ呼び出しができていること() {
+  void 受講生詳細の一覧が取得できリポジトリとコンバータが呼び出されていること() {
     //事前準備
     // Mockitoというのを使う
     List<Student> studentList = new ArrayList<>();
@@ -79,7 +79,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生詳細の情報取得_正しいIDで受講生が取得できること() {
+  void 正しいIDで受講生詳細が取得できること() {
     int testId = 1;
     StudentCourse mockCourse = new StudentCourse();
     mockCourse.setApplicationStatus(new ApplicationStatus());
@@ -100,7 +100,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生詳細の登録_正常にリポジトリの呼び出しができていること() {
+  void 受講生の登録が正常に行われリポジトリが呼び出されること() {
     List<StudentCourse> mockCourses = new ArrayList<>();
     StudentDetail studentDetail = new StudentDetail(mockStudent, mockCourses);
     //実行
@@ -111,7 +111,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生情報の更新_更新処理が正しく行われること() {
+  void 受講生情報の更新が正しく行われること() {
 
     mockStudent.setName("Original Name");
 
@@ -134,7 +134,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void initStudentCourses_受講生コースに正しいデータが設定されること() {
+  void 受講生コースに正しいデータが設定されること() {
     StudentCourse mockCourse = new StudentCourse();
     //実行
     sut.initStudentCourses(mockCourse, mockStudent);
@@ -154,17 +154,21 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生詳細の情報取得_存在しないIDで例外が投げられること() {
+  void 存在しないIDで受講生詳細の取得時にStudentBizExceptionが発生すること() {
     int testId = 999;
     when(repository.searchStudentByID(testId)).thenReturn(Optional.empty());
 
-    assertThrows(StudentBizException.class, () -> {
+    StudentBizException thrown = assertThrows(StudentBizException.class, () -> {
       sut.getStudent(testId);
     });
+
+    // エラーメッセージとステータスコードの確認
+    assertEquals("Student with ID " + testId + " not found", thrown.getMessage());
+    assertEquals(HttpStatus.NOT_FOUND, thrown.getStatus());
   }
 
   @Test
-  void 申込状況の全件検索_リポジトリから検索の呼び出しができること() {
+  void 申込状況の全件検索が正常に行われリポジトリが呼び出されること() {
     // 準備
     List<ApplicationStatus> mockStatusList = new ArrayList<>();
     when(sut.getApplicationStatusList()).thenReturn(mockStatusList);
@@ -176,7 +180,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 申込状況の１件検索_リポジトリから呼び出しができること() {
+  void 申込状況の１件検索が正常に行われリポジトリが呼び出されること() {
     // 準備
     int testId = 1;
     when(repository.searchApplicationStatusByID(testId)).thenReturn(Optional.of(mockStatus));
@@ -188,18 +192,23 @@ class StudentServiceTest {
   }
 
   @Test
-  void 申込状況の情報取得_存在しないIDで例外が投げられること() {
+  void 存在しないIDで申込状況取得時にStudentBizExceptionが発生すること() {
     int testId = 999;
     when(repository.searchApplicationStatusByID(testId)).thenReturn(Optional.empty());
 
-    assertThrows(StudentBizException.class, () -> {
+    StudentBizException thrown = assertThrows(StudentBizException.class, () -> {
       sut.getApplicationStatusById(testId);
     });
+
+    // エラーメッセージとステータスコードの確認
+    assertEquals("ApplicationStatus with Course ID " + testId + " not found", thrown.getMessage());
+    assertEquals(HttpStatus.NOT_FOUND, thrown.getStatus());
+
   }
 
 
   @Test
-  void 申込状況の登録_リポジトリから登録メソッドを呼び出せること() {
+  void 申込状況の登録が正常に行われリポジトリが呼び出されること() {
     //　実行
     sut.register(mockStatus);
     // 検証
@@ -208,7 +217,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 申込状況の登録_データベースアクセスエラーが発生した場合にStudentBizExceptionがスローされること() {
+  void 申込状況の登録時にデータベースアクセスエラーでStudentBizExceptionが発生すること() {
     // モックでリポジトリのメソッドがDataAccessExceptionをスローするように設定
     doThrow(new DataAccessException("Test Exception") {
     }).when(repository).createApplicationStatus(mockStatus);
@@ -227,7 +236,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 申込状況の更新_リポジトリから更新メソッドを呼び出せること() {
+  void 申込状況の更新が正常に行われリポジトリが呼び出されること() {
     // 準備
     mockStatus.setStatus("本申込");
     mockStatus.setId(1);
@@ -244,7 +253,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 申込状況の更新_更新対象がない場合にStudentBizExceptionがスローされること() {
+  void 更新対象の申込状況が存在しない場合にStudentBizExceptionが発生すること() {
     when(repository.searchApplicationStatusByID(anyInt())).thenReturn(
         Optional.empty());
     //実行
@@ -257,7 +266,7 @@ class StudentServiceTest {
 
 
   @Test
-  void 申込状況の更新_データベースアクセスエラーが発生した場合にStudentBizExceptionがスローされること() {
+  void 申込状況の更新時にデータベースアクセスエラーでStudentBizExceptionが発生すること() {
     // モックでリポジトリのメソッドがDataAccessExceptionをスローするように設定
     mockStatus.setStudentCourseId(1);
     doThrow(new DataAccessException("Test Exception") {
@@ -282,7 +291,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 申込状況の削除_リポジトリから削除メソッドを呼び出ししていること() {
+  void 申込状況の削除が正常に行われリポジトリが呼び出されること() {
     mockStatus.setId(1);
     mockStatus.setStudentCourseId(1);
     Optional<ApplicationStatus> optional = Optional.of(mockStatus);
@@ -295,7 +304,7 @@ class StudentServiceTest {
   }
 
   @Test
-  void 申込状況の削除_削除対象がない場合にStudentBizExceptionがスローされること() {
+  void 削除対象の申込状況が存在しない場合にStudentBizExceptionが発生すること() {
     when(repository.searchApplicationStatusByID(anyInt())).thenReturn(
         Optional.empty());
     //実行

@@ -22,20 +22,20 @@ class StudentRepositoryTest {
   private StudentRepository sut;
 
   @Test
-  void 受講生の全体検索が行えること() {
+  void 受講生一覧が正常に取得できること() {
     List<Student> actual = sut.searchStudentList();
     assertThat(actual.size()).isEqualTo(5);
   }
 
   @Test
-  void 受講生の１件検索が行えること() {
+  void 受講生IDで受講生が正しく検索できること() {
     Optional<Student> actual = sut.searchStudentByID(1);
     assertThat(actual).isPresent();
     assertThat(actual.get().getId()).isEqualTo(1);
   }
 
   @Test
-  void 受講生の登録が行えること() {
+  void 受講生が正常に登録されること() {
     //受講生情報設定
     Student student = new Student();
     student.setGender("male");
@@ -56,7 +56,7 @@ class StudentRepositoryTest {
 
 
   @Test
-  void 受講生の更新が行えること() {
+  void 既存の受講生が正しく更新されること() {
     //受講生情報設定
     Student student = new Student();
     student.setId(1);
@@ -82,14 +82,14 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 受講生が取得出来ない場合は空のリストが返ってくること() {
+  void 存在しない受講生IDで検索時に空の結果が返ること() {
     Optional<Student> actual = sut.searchStudentByID(999);
     assertThat(actual).isEmpty();
 
   }
 
   @Test
-  void 受講生が論理削除されている場合は空のリストが返ってくること() {
+  void 受講生が論理削除されている場合は空の結果が返ること() {
     // 削除される前に取得できることを確認
     Optional<Student> before = sut.searchStudentByID(1);
     assertThat(before).isPresent();
@@ -106,7 +106,7 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void Null値を持つ受講生を登録しようとするとエラーが発生すること() {
+  void Null値を持つ受講生を登録しようとすると例外が発生すること() {
     Student student = new Student();
     student.setGender(null); // NULL 値を設定
     student.setNickname("ニック");
@@ -134,7 +134,7 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 受講生コースの登録が行えること() {
+  void 受講生コースが正常に登録できること() {
     StudentCourse course = new StudentCourse();
     course.setStudentId(1);
     course.setCourseName("Web開発基礎");
@@ -150,7 +150,7 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 受講生コースの更新が行えること() {
+  void 受講生コースが正常に更新できること() {
     List<StudentCourse> courseList = sut.searchStudentCourseByID(1);
     StudentCourse course = courseList.getFirst();
     course.setCourseName("Updated Course");
@@ -163,25 +163,25 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 受講生コースが存在しない場合の検索結果が空であること() {
+  void 存在しない受講生IDで受講生コースを検索時に空の結果が返ること() {
     List<StudentCourse> actual = sut.searchStudentCourseByID(999);
     assertThat(actual).isEmpty();
   }
 
   @Test
-  void 申込状況の全件検索が行えること() {
+  void 申込状況一覧が正常に取得できること() {
     List<ApplicationStatus> actual = sut.searchApplicationStatusList();
     assertThat(actual.size()).isEqualTo(10);
   }
 
   @Test
-  void 申込状況の1件検索が行えること() {
+  void 申込状況IDで申込状況が正しく検索できること() {
     Optional<ApplicationStatus> actual = sut.searchApplicationStatusByID(1);
     assertThat(actual).isNotNull();
   }
 
   @Test
-  void 対象の申込状況が存在しない場合は空の値が返ってくること() {
+  void 存在しない申込状況IDで検索時に空の結果が返ること() {
     Optional<ApplicationStatus> actual = sut.searchApplicationStatusByID(999);
     assertThat(actual).isEmpty();
   }
@@ -203,7 +203,7 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 申込状況が登録できること() {
+  void 申込状況が正常に登録できること() {
     // 対応するコースを登録する
     StudentCourse course = new StudentCourse();
     course.setStudentId(1);
@@ -225,7 +225,7 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 異常な申込状況が登録できないこと() {
+  void 申込状況登録時に存在しない受講生コースIDで例外がスローされること() {
 
     // 申込状況準備
     ApplicationStatus applicationStatus = new ApplicationStatus();
@@ -239,7 +239,7 @@ class StudentRepositoryTest {
 
 
   @Test
-  void 申込状況が更新できること() {
+  void 申込状況が正常に更新できること() {
     // 申込状況準備
 
     ApplicationStatus applicationStatus = new ApplicationStatus();
@@ -260,7 +260,7 @@ class StudentRepositoryTest {
   }
 
   @Test
-  void 申込状況が削除できること() {
+  void 申込状況が正常に削除できること() {
     // 削除前のリスト取得
     List<ApplicationStatus> applicationStatusList = sut.searchApplicationStatusList();
 
