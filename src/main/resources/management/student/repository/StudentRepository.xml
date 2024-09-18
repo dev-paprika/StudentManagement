@@ -51,7 +51,7 @@
   <!-- 申込状況1件検索 -->
   <select id="searchApplicationStatusByID" parameterType="int"
     resultType="management.student.data.ApplicationStatus">
-    SELECT * FROM application_status WHERE student_course_id = #{studentCourseId}
+    SELECT * FROM application_status WHERE id = #{id}
   </select>
 
 
@@ -102,7 +102,8 @@
   </insert>
 
   <!-- 申込状況登録 -->
-  <insert id="createApplicationStatus" parameterType="management.student.data.ApplicationStatus">
+  <insert id="createApplicationStatus" parameterType="management.student.data.ApplicationStatus"
+    useGeneratedKeys="true" keyProperty="id">
     INSERT INTO application_status (
     student_course_id,
     status

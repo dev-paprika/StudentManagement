@@ -45,9 +45,7 @@ public class StudentService {
     //受講生全件取得
     List<Student> studentList = this.repository.searchStudentList();
     // 受講生コース全件取得
-    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseList();
-    // 受講生コース全件取得
-    List<ApplicationStatus> applicationStatusList = this.repository.searchApplicationStatusList();
+    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseWithStatus(null);
     //コンバータークラスで欲しい情報に変換
     return this.converter.convertStudentDetails(studentList, studentCoursesList);
   }
@@ -264,7 +262,7 @@ public class StudentService {
       this.repository.deleteApplicationStatus(id);
     } else {
       // 削除対象が存在しなかった場合
-      throw new StudentBizException("Student with ID " + id,
+      throw new StudentBizException("ApplicationStatus with ID " + id + " Not Found",
           HttpStatus.NOT_FOUND);
     }
 

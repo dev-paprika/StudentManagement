@@ -67,13 +67,12 @@ class StudentServiceTest {
     List<ApplicationStatus> statuses = new ArrayList<>();
 
     when(repository.searchStudentList()).thenReturn(studentList);
-    when(repository.searchStudentCourseList()).thenReturn(studentCourseList);
-    when(repository.searchApplicationStatusList()).thenReturn(statuses);
+    when(repository.searchStudentCourseWithStatus(null)).thenReturn(studentCourseList);
     //実行
     sut.getStudentList();
     //検証
     verify(repository, times(1)).searchStudentList();
-    verify(repository, times(1)).searchStudentCourseList();
+    verify(repository, times(1)).searchStudentCourseWithStatus(null);
     verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList);
 
   }
@@ -303,6 +302,7 @@ class StudentServiceTest {
   void 申込状況の更新時にデータベースアクセスエラーでStudentBizExceptionが発生すること() {
     // モックでリポジトリのメソッドがDataAccessExceptionをスローするように設定
     mockStatus.setStudentCourseId(1);
+    mockStatus.setId(1);
     doThrow(new DataAccessException("Test Exception") {
     }).when(repository).updateApplicationStatus(mockStatus);
 
