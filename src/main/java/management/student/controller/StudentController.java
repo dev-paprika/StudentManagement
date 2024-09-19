@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import management.student.converter.StudentConverter;
 import management.student.data.ApplicationStatus;
 import management.student.domain.StudentDetail;
@@ -229,13 +231,15 @@ public class StudentController {
       }
   )
   @PutMapping("/students/update")
-  public ResponseEntity<String> updateStudent(
+  public ResponseEntity<Map<String, String>> updateStudent(
       @Validated(OnUpdate.class) @RequestBody StudentDetail studentDetail) {
     //受講生更新のサービスのメソッド呼びだし
     this.service.update(studentDetail);
     // ResponseEntityで何を返すか設定する
-    // form-dataだとjsonで送られない
-    return ResponseEntity.ok("更新処理が成功しました");
+    // レスポンス用のメッセージをMapに格納
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "更新処理が成功しました");
+    return ResponseEntity.ok(response);
 
   }
 
@@ -264,13 +268,15 @@ public class StudentController {
       }
   )
   @PutMapping("/applicationStatuses/update")
-  public ResponseEntity<String> updateApplicationStatus(
+  public ResponseEntity<Map<String, String>> updateApplicationStatus(
       @Validated @RequestBody ApplicationStatus status) {
     //申込状況更新のサービスのメソッド呼びだし
     this.service.update(status);
     // ResponseEntityで何を返すか設定する
-    // form-dataだとjsonで送られない
-    return ResponseEntity.ok("更新処理が成功しました");
+    // レスポンス用のメッセージをMapに格納する
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "更新処理が成功しました");
+    return ResponseEntity.ok(response);
 
   }
 
@@ -296,11 +302,14 @@ public class StudentController {
       }
   )
   @DeleteMapping("/applicationStatuses/{id}")
-  public ResponseEntity<String> deleteApplicationStatus(
+  public ResponseEntity<Map<String, String>> deleteApplicationStatus(
       @PathVariable @Valid @Min(1) @Max(999) String id) {
     // サービスメソッドを呼び出し、申込状況を削除
     service.deleteApplicationStatus(Integer.parseInt(id));
-    return ResponseEntity.ok("申込状況が正常に削除されました");
+    // レスポンス用のメッセージをMapに格納する
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "削除処理が成功しました");
+    return ResponseEntity.ok(response);
   }
 
 }
