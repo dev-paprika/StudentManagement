@@ -2,6 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="management.student.repository.StudentRepository">
+  <!-- StudentCourseとApplicationStatusとのマッピング -->
+  <resultMap id="StudentCourseMap" type="management.student.data.StudentCourse">
+    <id column="id" property="id"/>
+    <result column="student_id" property="studentId"/>
+    <result column="course_name" property="courseName"/>
+    <result column="start_date" property="startDate"/>
+    <result column="end_date" property="endDate"/>
+    <!-- associationの設定 -->
+    <association property="applicationStatus" javaType="management.student.data.ApplicationStatus">
+      <id column="status_id" property="id"/>
+      <result column="student_course_id" property="studentCourseId"/>
+      <result column="status" property="status"/>
+    </association>
+  </resultMap>
 
   <!-- SQLフラグメント -->
   <sql id="BaseColumnList">
@@ -29,6 +43,29 @@
     SELECT * FROM student_courses WHERE student_id = #{studentId}
   </select>
 
+  <!-- 申込状況全件検索 -->
+  <select id="searchApplicationStatusList" resultType="management.student.data.ApplicationStatus">
+    SELECT * FROM application_status
+  </select>
+
+  <!-- 申込状況1件検索 -->
+  <select id="searchApplicationStatusByID" parameterType="int"
+    resultType="management.student.data.ApplicationStatus">
+    SELECT * FROM application_status WHERE id = #{id}
+  </select>
+
+
+  <!-- StudentCourseをStudentId指定で検索するクエリ -->
+  <select id="searchStudentCourseWithStatus" parameterType="int" resultMap="StudentCourseMap">
+    SELECT sc.*, appStatus.id AS status_id, student_course_id, status
+    FROM student_courses sc
+    LEFT JOIN application_status appStatus ON sc.id = appStatus.student_course_id
+    WHERE 1=1
+    <if test="studentId != null">
+      AND sc.student_id = #{studentId}
+    </if>
+  </select>
+
   <!-- 受講生登録 -->
   <insert id="createStudent" parameterType="management.student.data.Student" useGeneratedKeys="true"
     keyProperty="id">
@@ -48,7 +85,9 @@
   </insert>
 
   <!-- 受講生コース登録 -->
-  <insert id="createStudentCourse" parameterType="management.student.data.StudentCourse">
+  <insert id="createStudentCourse" parameterType="management.student.data.StudentCourse"
+    useGeneratedKeys="true"
+    keyProperty="id">
     INSERT INTO student_courses (
     student_id,
     course_name,
@@ -59,6 +98,18 @@
     #{courseName},
     #{startDate},
     #{endDate}
+    )
+  </insert>
+
+  <!-- 申込状況登録 -->
+  <insert id="createApplicationStatus" parameterType="management.student.data.ApplicationStatus"
+    useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO application_status (
+    student_course_id,
+    status
+    ) VALUES (
+    #{studentCourseId},
+    #{status}
     )
   </insert>
 
@@ -78,7 +129,7 @@
     delete_flag = #{deleteFlag}
     WHERE id = #{id}
   </update>
-
+  <!-- 受講生コース更新 -->
   <update id="updateStudentCourse" parameterType="management.student.data.StudentCourse">
     UPDATE student_courses
     SET
@@ -86,5 +137,20 @@
     WHERE id = #{id}
   </update>
 
+  <!-- 申込状況更新 -->
+  <update id="updateApplicationStatus" parameterType="management.student.data.ApplicationStatus"
+    useGeneratedKeys="true"
+    keyProperty="id">
+    UPDATE application_status
+    SET
+    status = #{status}
+    WHERE id = #{id}
+  </update>
+
+  <!-- 申込状況削除 -->
+  <delete id="deleteApplicationStatus" parameterType="int">
+    DELETE FROM application_status
+    WHERE id = #{id}
+  </delete>
 
 </mapper>

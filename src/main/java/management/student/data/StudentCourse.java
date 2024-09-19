@@ -17,5 +17,6 @@ public class StudentCourse {
   private String courseName; // コース名
   private LocalDateTime startDate;    //受講開始日
   private LocalDateTime endDate;     //受講完了日
+  private ApplicationStatus applicationStatus; //申込状況
 
 }

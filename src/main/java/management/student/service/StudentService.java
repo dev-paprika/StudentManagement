@@ -6,12 +6,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import management.student.converter.StudentConverter;
+import management.student.data.ApplicationStatus;
 import management.student.data.Student;
 import management.student.data.StudentCourse;
 import management.student.domain.StudentDetail;
 import management.student.exception.StudentBizException;
 import management.student.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +45,7 @@ public class StudentService {
     //受講生全件取得
     List<Student> studentList = this.repository.searchStudentList();
     // 受講生コース全件取得
-    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseList();
+    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseWithStatus(null);
     //コンバータークラスで欲しい情報に変換
     return this.converter.convertStudentDetails(studentList, studentCoursesList);
   }
@@ -61,7 +63,7 @@ public class StudentService {
     Student student = this.repository.searchStudentByID(id)
         .orElseThrow(() -> new StudentBizException("Student with ID " + id + " not found",
             HttpStatus.NOT_FOUND));
-    List<StudentCourse> courses = this.repository.searchStudentCourseByID(student.getId());
+    List<StudentCourse> courses = this.repository.searchStudentCourseWithStatus(student.getId());
     return new StudentDetail(student, courses);
   }
 
@@ -85,6 +87,28 @@ public class StudentService {
   }
 
   /**
+   * 申込状況全件検索
+   *
+   * @return List<ApplicationStatus> 申込状況
+   */
+  public List<ApplicationStatus> getApplicationStatusList() {
+    return this.repository.searchApplicationStatusList();
+  }
+
+  /**
+   * 申込状況１件検索
+   *
+   * @return ApplicationStatus 申込状況
+   */
+  public ApplicationStatus getApplicationStatusById(int id) {
+    ApplicationStatus applicationStatus = this.repository.searchApplicationStatusByID(id)
+        .orElseThrow(() -> new StudentBizException(
+            "ApplicationStatus with Course ID " + id + " not found",
+            HttpStatus.NOT_FOUND));
+    return applicationStatus;
+  }
+
+  /**
    * 受講生詳細の登録
    * 受講生と受講生コースをそれぞれ登録する
    * 受講生コースには受講生登録の後に紐づく受講生ID、コース開始日、コース終了日を設定して登録する
@@ -99,10 +123,15 @@ public class StudentService {
     resister(student);
     List<StudentCourse> courses = studentDetail.getStudentCourseList();
     //受講生コースのループを回して受講生コースに初期値を設定
-    courses.forEach(studentCourses -> {
-      initStudentCourses(studentCourses, student);
+    courses.forEach(courseWithStatus -> {
+      initStudentCourses(courseWithStatus, student);
       //受講生コース登録
-      resister(studentCourses);
+      resister(courseWithStatus);
+      // 申込状況登録
+      ApplicationStatus status = courseWithStatus.getApplicationStatus();
+      status.setStudentCourseId(courseWithStatus.getId());
+      register(status);
+
     });
     return studentDetail;
   }
@@ -121,22 +150,29 @@ public class StudentService {
     mergedStudent(beforeStudentDetail, studentDetail);
     update(studentDetail.getStudent());
     //受講生コースを受講生が削除されていないときのみ更新
-    studentDetail.getStudentCourseList().stream()
-        .filter(courses -> !studentDetail.getStudent().isDeleteFlag()).forEach(this::update);
+    if (!studentDetail.getStudent().isDeleteFlag()) {
+      studentDetail.getStudentCourseList().forEach(courseWithStatus -> {
+        // コースを更新
+        update(courseWithStatus);
+        // 申込状況更新
+        ApplicationStatus status = courseWithStatus.getApplicationStatus();
+        update(status);
+      });
+    }
   }
 
   /**
    * 受講生コースに紐づく受講生ID,コース開始日、コース終了日を設定する
    *
-   * @param courses 　受講生コース
+   * @param course  　受講生コース
    * @param student 　受講生
    */
-  void initStudentCourses(StudentCourse courses, Student student) {
-    courses.setStudentId(student.getId());
+  void initStudentCourses(StudentCourse course, Student student) {
+    course.setStudentId(student.getId());
     // startDateは現在の日付、endDateは１年後を設定
     LocalDateTime today = LocalDateTime.now();
-    courses.setStartDate(today);
-    courses.setEndDate(today.plusYears(1)); // 1年後の日付を設定
+    course.setStartDate(today);
+    course.setEndDate(today.plusYears(1)); // 1年後の日付を設定
   }
 
   /**
@@ -159,6 +195,21 @@ public class StudentService {
   }
 
   /**
+   * 申込状況登録
+   *
+   * @param status 申込状況
+   */
+  public ApplicationStatus register(ApplicationStatus status) {
+    try {
+      this.repository.createApplicationStatus(status);
+    } catch (DataAccessException e) {
+      throw new StudentBizException("DataBaseAccess Error",
+          HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return status;
+  }
+
+  /**
    * 受講生更新
    *
    * @param student 　受講生
@@ -174,6 +225,47 @@ public class StudentService {
    */
   private void update(StudentCourse courses) {
     this.repository.updateStudentCourse(courses);
+  }
+
+  /**
+   * 申込状況更新
+   *
+   * @param status 申込状況
+   */
+  public void update(ApplicationStatus status) {
+    try {
+      // 更新対象が存在する場合に更新を実行
+      if (this.repository.searchApplicationStatusByID(status.getId()).isPresent()) {
+        this.repository.updateApplicationStatus(status);
+      } else {
+        // 更新対象が存在しない場合
+        throw new StudentBizException(
+            "ApplicationStatus with ID " + status.getId() + " not found",
+            HttpStatus.NOT_FOUND);
+      }
+    } catch (DataAccessException e) {
+      // データベースアクセスエラーが発生した場合の処理
+      throw new StudentBizException("DataBaseAccess Error",
+          HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+
+  /**
+   * 申込状況削除
+   *
+   * @param id 申込状況ID
+   */
+  public void deleteApplicationStatus(int id) {
+    // 削除対象が存在した場合に実行
+    if (this.repository.searchApplicationStatusByID(id).isPresent()) {
+      this.repository.deleteApplicationStatus(id);
+    } else {
+      // 削除対象が存在しなかった場合
+      throw new StudentBizException("ApplicationStatus with ID " + id + " Not Found",
+          HttpStatus.NOT_FOUND);
+    }
+
   }
 
   /**

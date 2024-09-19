@@ -2,9 +2,11 @@ package management.student.repository;
 
 import java.util.List;
 import java.util.Optional;
+import management.student.data.ApplicationStatus;
 import management.student.data.Student;
 import management.student.data.StudentCourse;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 受講生テーブルと受講生詳細テーブルを操作するRepositoryです。
@@ -41,6 +43,30 @@ public interface StudentRepository {
    */
   List<StudentCourse> searchStudentCourseByID(int studentId);
 
+  /**
+   * 申込状況全件検索
+   *
+   * @return List<StudentCourses> 申込状況
+   */
+  List<ApplicationStatus> searchApplicationStatusList();
+
+  /**
+   * 申込状況１件検索
+   *
+   * @return 申込状況
+   */
+  Optional<ApplicationStatus> searchApplicationStatusByID(int id);
+
+
+  /**
+   * 受講生コースと申込状況の検索
+   *
+   * @param studentId 　受講生ID
+   * @return List<StudentCourse> 受講生コース
+   */
+  List<StudentCourse> searchStudentCourseWithStatus(
+      @Param("studentId") Integer studentId
+  );
 
   /**
    * 受講生登録
@@ -57,6 +83,14 @@ public interface StudentRepository {
   void createStudentCourse(StudentCourse studentCourse);
 
   /**
+   * 申込状況登録
+   *
+   * @param applicationStatus 　申込状況
+   */
+  void createApplicationStatus(ApplicationStatus applicationStatus);
+
+
+  /**
    * 受講生更新
    *
    * @param student 　受講生
@@ -69,4 +103,18 @@ public interface StudentRepository {
    * @param courses 　受講生コース
    */
   void updateStudentCourse(StudentCourse courses);
+
+  /**
+   * 申込状況更新
+   *
+   * @param  　applicationStatus 申込状況
+   */
+  void updateApplicationStatus(ApplicationStatus applicationStatus);
+
+  /**
+   * 申込状況削除
+   *
+   * @param  　applicationStatusId 申込状況ID
+   */
+  void deleteApplicationStatus(int applicationStatusId);
 }

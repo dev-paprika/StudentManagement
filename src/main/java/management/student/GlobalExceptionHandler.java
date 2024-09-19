@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
    * @return レスポンス
    */
   @ExceptionHandler(StudentBizException.class)
-  public ResponseEntity<Object> StudentBizException(StudentBizException ex) {
+  public ResponseEntity<Object> handleStudentBizException(StudentBizException ex) {
     Map<String, Object> errorDetails = new HashMap<>();
     errorDetails.put("message", ex.getMessage());
     return ResponseEntity.status(ex.getStatus()).body(errorDetails);

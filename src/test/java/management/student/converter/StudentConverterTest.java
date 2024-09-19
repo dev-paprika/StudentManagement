@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import management.student.data.ApplicationStatus;
 import management.student.data.Student;
 import management.student.data.StudentCourse;
 import management.student.domain.StudentDetail;
@@ -29,16 +30,23 @@ class StudentConverterTest {
     //事前準備
     List<Student> studentList = new ArrayList<>();
     List<StudentCourse> studentCourseList = new ArrayList<>();
+    List<ApplicationStatus> statuses = new ArrayList<>();
     // 受講生と受講生コースの作成
     Student student = createStudent();
     StudentCourse studentCourse = new StudentCourse();
+    ApplicationStatus status = new ApplicationStatus();
+
     studentCourse.setId(1);
     studentCourse.setStudentId(1); //受講生IDと受講生オブジェクトに設定したIDが同じになるようにする
     studentCourse.setCourseName("Javaコース");
     studentCourse.setStartDate(LocalDateTime.now());
     studentCourse.setEndDate(LocalDateTime.now().plusYears(1));
+    status.setStudentCourseId(studentCourse.getId());
+    status.setId(1);
+    studentCourse.setApplicationStatus(status);
     studentList.add(student);
     studentCourseList.add(studentCourse);
+
     // 想定されるリストの設定
     List<StudentDetail> expectedList = List.of(new StudentDetail(student, studentCourseList));
     // 実行
@@ -54,6 +62,7 @@ class StudentConverterTest {
     //事前準備
     List<Student> studentList = new ArrayList<>();
     List<StudentCourse> studentCourseList = new ArrayList<>();
+    List<ApplicationStatus> statuses = new ArrayList<>();
     // 受講生と受講生コースの作成
     Student student = createStudent();
     StudentCourse studentCourse = new StudentCourse();

@@ -26,3 +26,12 @@ CREATE TABLE IF NOT EXISTS student_courses (
     PRIMARY KEY (id),
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE
 );
+
+-- application_statusesテーブル
+CREATE TABLE IF NOT EXISTS application_status (
+    id INT NOT NULL AUTO_INCREMENT,
+    student_course_id INT NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (student_course_id) REFERENCES student_courses(id) ON DELETE CASCADE
+);
