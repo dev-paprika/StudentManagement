@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import management.student.service.StudentService;
 import management.student.validation.OnCreate;
 import management.student.validation.OnUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -49,14 +52,26 @@ public class StudentController {
     this.converter = converter;
   }
 
+
   /**
    * 受講生詳細の情報を取得
-   * 全件検索のため条件の指定はなし
+   * 渡された引数によって、絞り込み検索を行う
+   * 引数がない場合は全件検索
    *
-   * @return String 受講生一覧（全件）
+   * @param studentId       　受講生ID
+   * @param name            　　受講生名前
+   * @param kana            　　受講生フリガナ
+   * @param email           　　受講生メールアドレス
+   * @param phoneNumber     　受講生電話番号
+   * @param age             　　受講生年齢
+   * @param courseName      　受講コース名
+   * @param courseStartDate 　受講コース開始日
+   * @param courseEndDate   　　受講コース終了日
+   * @param status          　　受講コース申込状況
+   * @return ResponseEntity<List < StudentDetail>> 受講生詳細のリスト
    */
   @Operation(
-      summary = "全受講生情報の取得",
+      summary = "受講生情報の取得",
       description = "データベースに登録されている全受講生の詳細情報を取得します。",
       responses = {
           @ApiResponse(
@@ -68,8 +83,28 @@ public class StudentController {
       }
   )
   @GetMapping("/students")
-  public List<StudentDetail> getStudentList() {
-    return this.service.getStudentList();
+  public ResponseEntity<List<StudentDetail>> getStudentList(
+      @RequestParam(required = false) Integer studentId,
+      @RequestParam(required = false) String name,
+      @RequestParam(required = false) String kana,
+      @RequestParam(required = false) String email,
+      @RequestParam(required = false) String phoneNumber,
+      @RequestParam(required = false) Integer age,
+      @RequestParam(required = false) String courseName,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime courseStartDate,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime courseEndDate,
+      @RequestParam(required = false) String status
+  ) {
+    // サービスメソッドを呼び出し、検索処理を実行
+    List<StudentDetail> studentDetails = service.getStudentList(
+        studentId, name, kana, email, phoneNumber, age, courseName, courseStartDate, courseEndDate,
+        status);
+
+    if (studentDetails.isEmpty()) {
+      return ResponseEntity.noContent().build();
+    }
+    return ResponseEntity.ok(studentDetails);
+
   }
 
 

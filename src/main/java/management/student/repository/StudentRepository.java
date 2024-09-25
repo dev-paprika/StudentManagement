@@ -1,5 +1,6 @@
 package management.student.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import management.student.data.ApplicationStatus;
@@ -19,7 +20,12 @@ public interface StudentRepository {
    *
    * @return 受講生一覧
    */
-  List<Student> searchStudentList();
+  List<Student> searchStudentList(@Param("id") Integer studentId,
+      @Param("name") String name,
+      @Param("furigana") String kana,
+      @Param("email") String email,
+      @Param("phoneNumber") String phoneNumber,
+      @Param("age") Integer age);
 
   /**
    * 受講生1件検索
@@ -30,7 +36,7 @@ public interface StudentRepository {
 
 
   /**
-   * 受講生コース全件検索
+   * 受講生コース絞り込み検索
    *
    * @return List<StudentCourses> 受講生コース
    */
@@ -64,9 +70,12 @@ public interface StudentRepository {
    * @param studentId 　受講生ID
    * @return List<StudentCourse> 受講生コース
    */
-  List<StudentCourse> searchStudentCourseWithStatus(
-      @Param("studentId") Integer studentId
-  );
+  List<StudentCourse> searchStudentCourseWithStatus(@Param("studentId") Integer studentId,
+      @Param("courseName") String courseName,
+      @Param("startDate") LocalDateTime startDate,
+      @Param("endDate") LocalDateTime endDate,
+      @Param("status") String status);
+
 
   /**
    * 受講生登録

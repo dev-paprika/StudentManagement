@@ -11,12 +11,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -38,6 +41,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 @WebMvcTest(StudentController.class)
 //@AutoConfigureMockMvc
@@ -93,12 +97,65 @@ class StudentControllerTest {
 
   @Test
   void 受講生詳細の一覧情報が正常に取得できること() throws Exception {
-    when(service.getStudentList()).thenReturn(List.of(new StudentDetail()));
+    when(service.getStudentList(null, null, null, null, null, null, null, null, null,
+        null)).thenReturn(List.of(new StudentDetail()));
     mockMvc.perform(get("/students"))
         .andExpect(status().isOk());
 //        .andExpect(content().json("[]"));
 
-    verify(service, times(1)).getStudentList();
+    verify(service, times(1)).getStudentList(null, null, null, null, null, null, null, null, null,
+        null);
+  }
+
+  @Test
+  void 受講生詳細の一覧情報が絞り込み検索で正常に取得できること() throws Exception {
+    // 受講生を初期設定
+    Student student = createValidStudent();
+    // 受講生コースの設定
+    String courseName = "Javaプログラミング基礎";
+    LocalDateTime courseStartDate = LocalDateTime.of(2024, 8, 1, 9, 0);
+    LocalDateTime courseEndDate = LocalDateTime.of(2024, 8, 1, 10, 30);
+    String status = "本申込";
+
+    // テスト用のStudentDetailリストを準備
+    List<StudentDetail> studentDetails = new ArrayList<>();
+    StudentDetail studentDetail = new StudentDetail(student,
+        List.of(new StudentCourse()));
+    studentDetails.add(new StudentDetail());
+
+    // モックの設定
+    when(service.getStudentList(student.getId(), student.getName(), student.getFurigana(),
+        student.getEmail(),
+        student.getPhoneNumber(), student.getAge(),
+        courseName, courseStartDate,
+        courseEndDate,
+        status)).thenReturn(studentDetails);
+
+    // 実行と検証
+    mockMvc.perform(get("/students")
+            .param("studentId", String.valueOf(student.getId()))
+            .param("name", student.getName())
+            .param("kana", student.getFurigana())
+            .param("email", student.getEmail())
+            .param("phoneNumber", student.getPhoneNumber())
+            .param("age", String.valueOf(student.getAge()))
+            .param("courseName", courseName)
+            .param("courseStartDate", courseStartDate.toString())
+            .param("courseEndDate", courseEndDate.toString())
+            .param("status", status)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect((ResultMatcher) jsonPath("$").isArray())  // 配列が返ってくることを確認
+        .andExpect((ResultMatcher) jsonPath("$.length()").value(1));  // 結果の数を確認
+
+    // パラメータを全て設定してメソッドが呼び出されているか検証
+    verify(service, times(1)).getStudentList(student.getId(), student.getName(),
+        student.getFurigana(),
+        student.getEmail(),
+        student.getPhoneNumber(), student.getAge(),
+        courseName, courseStartDate,
+        courseEndDate,
+        status);
   }
 
   @Test

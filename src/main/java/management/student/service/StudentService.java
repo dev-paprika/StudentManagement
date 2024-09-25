@@ -36,17 +36,32 @@ public class StudentService {
   }
 
   /**
-   * 受講生の情報を取得
-   * 全件検索のため条件の指定はなし
+   * 受講生の情報を引数に渡されたパラメータによって絞り込み検索を行う
+   * パラメータが渡されていない場合は全件検索となる
    *
-   * @return String 受講生情報
+   * @param studentId       　受講生ID
+   * @param name            　　受講生名前
+   * @param kana            　　受講生フリガナ
+   * @param email           　　受講生メールアドレス
+   * @param phoneNumber     　受講生電話番号
+   * @param age             　　受講生年齢
+   * @param courseName      　受講コース名
+   * @param courseStartDate 　受講コース開始日
+   * @param courseEndDate   　　受講コース終了日
+   * @param status          　　受講コース申込状況
+   * @return List<StudentDetail>　 受講生詳細リスト
    */
-  public List<StudentDetail> getStudentList() {
-    //受講生全件取得
-    List<Student> studentList = this.repository.searchStudentList();
-    // 受講生コース全件取得
-    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseWithStatus(null);
-    //コンバータークラスで欲しい情報に変換
+  public List<StudentDetail> getStudentList(Integer studentId, String name, String kana,
+      String email, String phoneNumber, Integer age, String courseName,
+      LocalDateTime courseStartDate, LocalDateTime courseEndDate, String status) {
+    // 受講生を引数によって検索する
+    List<Student> studentList = this.repository.searchStudentList(studentId, name, kana, email,
+        phoneNumber, age);
+
+    // 受講生コースを引数によって検索する
+    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseWithStatus(
+        studentId,
+        courseName, courseStartDate, courseEndDate, status);
     return this.converter.convertStudentDetails(studentList, studentCoursesList);
   }
 
@@ -63,7 +78,8 @@ public class StudentService {
     Student student = this.repository.searchStudentByID(id)
         .orElseThrow(() -> new StudentBizException("Student with ID " + id + " not found",
             HttpStatus.NOT_FOUND));
-    List<StudentCourse> courses = this.repository.searchStudentCourseWithStatus(student.getId());
+    List<StudentCourse> courses = this.repository.searchStudentCourseWithStatus(student.getId(),
+        null, null, null, null);
     return new StudentDetail(student, courses);
   }
 

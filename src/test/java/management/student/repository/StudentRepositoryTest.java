@@ -23,7 +23,8 @@ class StudentRepositoryTest {
 
   @Test
   void 受講生一覧が正常に取得できること() {
-    List<Student> actual = sut.searchStudentList();
+    List<Student> actual = sut.searchStudentList(
+        null, null, null, null, null, null);
     assertThat(actual.size()).isEqualTo(5);
   }
 
@@ -32,6 +33,21 @@ class StudentRepositoryTest {
     Optional<Student> actual = sut.searchStudentByID(1);
     assertThat(actual).isPresent();
     assertThat(actual.get().getId()).isEqualTo(1);
+  }
+
+  @Test
+  void 受講生名で受講生が正しく検索できること() {
+    List<Student> students = sut.searchStudentList(null, "佐藤", null, null, null, null);
+    assertThat(students).hasSize(1);
+    assertThat(students.get(0).getName()).isEqualTo("佐藤 太郎");
+  }
+
+  @Test
+  void メールアドレスで受講生が正しく検索できること() {
+    List<Student> students = sut.searchStudentList(null, null, null, "taro.sato@example.com",
+        null, null);
+    assertThat(students).hasSize(1);
+    assertThat(students.get(0).getEmail()).isEqualTo("taro.sato@example.com");
   }
 
   @Test
@@ -50,7 +66,8 @@ class StudentRepositoryTest {
     student.setDeleteFlag(false);
     sut.createStudent(student);
 
-    List<Student> actual = sut.searchStudentList();
+    List<Student> actual = sut.searchStudentList(null,
+        null, null, null, null, null);
     assertThat(actual.size()).isEqualTo(6);
   }
 
@@ -188,18 +205,53 @@ class StudentRepositoryTest {
 
   @Test
   void 申込状況と紐づく受講生コースが受講生ＩＤを指定せず検索できること() {
-    List<StudentCourse> actual = sut.searchStudentCourseWithStatus(null);
+    List<StudentCourse> actual = sut.searchStudentCourseWithStatus(null,
+        null, null, null, null);
     assertThat(actual.size()).isEqualTo(10);
     assertThat(actual.getFirst().getApplicationStatus()).isNotNull();
   }
 
   @Test
   void 申込状況と紐づく受講生コースが受講生ＩＤを指定して検索できること() {
-    List<StudentCourse> actual = sut.searchStudentCourseWithStatus(1);
+    List<StudentCourse> actual = sut.searchStudentCourseWithStatus(1, null,
+        null, null, null);
     assertThat(actual.size()).isEqualTo(2);
     assertThat(actual.getFirst().getApplicationStatus()).isNotNull();
     assertThat(actual.getLast().getApplicationStatus()).isNotNull();
 
+  }
+
+  @Test
+  void 申込状況と紐づく受講生コースが受講生ＩＤとコース名を指定して検索できること() {
+    List<StudentCourse> courses = sut.searchStudentCourseWithStatus(1, "Javaプログラミング基礎",
+        null, null, null);
+    assertThat(courses).hasSize(1);
+    assertThat(courses.get(0).getCourseName()).isEqualTo("Javaプログラミング基礎");
+
+  }
+
+  @Test
+  void 申込状況と紐づく受講生コースが申込状況で検索できること() {
+    List<StudentCourse> courses = sut.searchStudentCourseWithStatus(null, null, null, null,
+        "仮申し込み");
+    assertThat(courses).hasSize(4);
+    assertThat(courses.get(0).getApplicationStatus().getStatus()).isEqualTo("仮申し込み");
+  }
+
+  @Test
+  void 申込状況と紐づく受講生コースが受講開始日で検索できること() {
+    LocalDateTime startDate = LocalDateTime.of(2024, 8, 5, 0, 0, 0);
+    List<StudentCourse> courses = sut.searchStudentCourseWithStatus(null, null, startDate, null,
+        null);
+    assertThat(courses).hasSize(4); // 受講開始日が2024-08-01以降のコース
+  }
+
+  @Test
+  void 申込状況と紐づく受講生コースが受講終了日で検索できること() {
+    LocalDateTime endDate = LocalDateTime.of(2024, 8, 2, 23, 59, 59);
+    List<StudentCourse> courses = sut.searchStudentCourseWithStatus(null, null, null, endDate,
+        null);
+    assertThat(courses).hasSize(4); // 受講開始日が2024-08-01以降のコース
   }
 
   @Test
