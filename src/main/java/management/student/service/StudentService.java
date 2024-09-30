@@ -36,19 +36,61 @@ public class StudentService {
   }
 
   /**
-   * 受講生の情報を取得
-   * 全件検索のため条件の指定はなし
+   * 受講生の情報を引数に渡されたパラメータによって絞り込み検索を行う
+   * パラメータが渡されていない場合は全件検索となる
    *
-   * @return String 受講生情報
+   * @param studentId       　受講生ID
+   * @param name            　　受講生名前
+   * @param kana            　　受講生フリガナ
+   * @param email           　　受講生メールアドレス
+   * @param phoneNumber     　受講生電話番号
+   * @param age             　　受講生年齢
+   * @param courseName      　受講コース名
+   * @param courseStartDate 　受講コース開始日
+   * @param courseEndDate   　　受講コース終了日
+   * @param status          　　受講コース申込状況
+   * @return List<StudentDetail>　 受講生詳細リスト
    */
-  public List<StudentDetail> getStudentList() {
-    //受講生全件取得
-    List<Student> studentList = this.repository.searchStudentList();
-    // 受講生コース全件取得
-    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseWithStatus(null);
-    //コンバータークラスで欲しい情報に変換
-    return this.converter.convertStudentDetails(studentList, studentCoursesList);
+  public List<StudentDetail> getStudentList(Integer studentId, String name, String kana,
+      String email, String phoneNumber, Integer age, String courseName,
+      LocalDateTime courseStartDate, LocalDateTime courseEndDate, String status) {
+    // 受講生を引数によって検索する
+    List<Student> studentList = this.repository.searchStudentList(studentId, name, kana, email,
+        phoneNumber, age);
+
+    // 受講生コースを引数によって検索する
+    List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseWithStatus(
+        studentId,
+        courseName, courseStartDate, courseEndDate, status);
+
+    List<Integer> searchIds = null;
+    if (hasCourseFilter(courseName, courseStartDate, courseEndDate, status)) {
+      //受講生コースに絞り込み条件がある場合はそれに紐づく受講生IDを抽出する
+      searchIds = studentCoursesList.stream()
+          .map(StudentCourse::getStudentId)
+          .distinct()
+          .toList();
+    }
+
+    return this.converter.convertStudentDetails(studentList, studentCoursesList, searchIds);
   }
+
+  /**
+   * 受講生コースの検索条件が指定されているか判定する
+   *
+   * @param courseName      　受講生コース名
+   * @param courseStartDate 　受講開始日
+   * @param courseEndDate   　　受講終了日
+   * @param status          　申込状況
+   * @return true/false
+   */
+  boolean hasCourseFilter(String courseName, LocalDateTime courseStartDate,
+      LocalDateTime courseEndDate, String status) {
+
+    return courseName != null || courseStartDate != null || courseEndDate != null
+        || status != null;
+  }
+
 
   /**
    * 受講生詳細の情報（1件）を取得
@@ -63,7 +105,8 @@ public class StudentService {
     Student student = this.repository.searchStudentByID(id)
         .orElseThrow(() -> new StudentBizException("Student with ID " + id + " not found",
             HttpStatus.NOT_FOUND));
-    List<StudentCourse> courses = this.repository.searchStudentCourseWithStatus(student.getId());
+    List<StudentCourse> courses = this.repository.searchStudentCourseWithStatus(student.getId(),
+        null, null, null, null);
     return new StudentDetail(student, courses);
   }
 

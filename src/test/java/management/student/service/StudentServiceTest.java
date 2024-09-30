@@ -59,22 +59,64 @@ class StudentServiceTest {
 
 
   @Test
-  void 受講生詳細の一覧が取得できリポジトリとコンバータが呼び出されていること() {
+  void 受講生詳細取得時パラメータが全てnullの場合一覧が取得できリポジトリとコンバータが呼び出されていること() {
     //事前準備
     // Mockitoというのを使う
     List<Student> studentList = new ArrayList<>();
     List<StudentCourse> studentCourseList = new ArrayList<>();
     List<ApplicationStatus> statuses = new ArrayList<>();
 
-    when(repository.searchStudentList()).thenReturn(studentList);
-    when(repository.searchStudentCourseWithStatus(null)).thenReturn(studentCourseList);
+    when(repository.searchStudentList(null, null, null,
+        null, null, null)).thenReturn(studentList);
+    when(repository.searchStudentCourseWithStatus(null, null,
+        null, null, null)).thenReturn(studentCourseList);
     //実行
-    sut.getStudentList();
+    sut.getStudentList(null, null, null, null, null, null, null, null, null, null);
     //検証
-    verify(repository, times(1)).searchStudentList();
-    verify(repository, times(1)).searchStudentCourseWithStatus(null);
-    verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList);
+    verify(repository, times(1)).searchStudentList(null, null
+        , null, null, null, null);
+    verify(repository, times(1)).searchStudentCourseWithStatus(null,
+        null, null, null, null);
+    verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList, null);
 
+  }
+
+  @Test
+  void 受講生詳細取得時パラメータが全て設定されている場合にリポジトリとコンバータからメソッドが呼び出されていること() {
+    // 各パラメータの設定
+    Integer studentId = 1;
+    String name = "佐藤 太郎";
+    String kana = "さとう たろう";
+    String email = "taro.sato@example.com";
+    String phoneNumber = "09011112222";
+    Integer age = 20;
+    String courseName = "Javaプログラミング基礎";
+    LocalDateTime courseStartDate = LocalDateTime.of(2024, 8, 1, 9, 0);
+    LocalDateTime courseEndDate = LocalDateTime.of(2024, 8, 1, 10, 30);
+    String status = "本申込";
+
+    // モックの設定
+    List<Student> studentList = new ArrayList<>();
+    List<StudentCourse> studentCourseList = new ArrayList<>();
+    when(repository.searchStudentList(studentId, name, kana, email, phoneNumber, age))
+        .thenReturn(studentList);
+    when(repository.searchStudentCourseWithStatus(studentId, courseName, courseStartDate,
+        courseEndDate, status))
+        .thenReturn(studentCourseList);
+
+    List<StudentDetail> expectedDetails = new ArrayList<>();
+    when(converter.convertStudentDetails(studentList, studentCourseList, List.of(1))).thenReturn(
+        expectedDetails);
+
+    // 実行
+    List<StudentDetail> result = sut.getStudentList(studentId, name, kana, email, phoneNumber, age,
+        courseName, courseStartDate, courseEndDate, status);
+
+    // 検証
+    verify(repository, times(1)).searchStudentList(studentId, name, kana, email, phoneNumber, age);
+    verify(repository, times(1)).searchStudentCourseWithStatus(studentId, courseName,
+        courseStartDate, courseEndDate, status);
+    verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList, List.of(1));
   }
 
   @Test
@@ -85,7 +127,8 @@ class StudentServiceTest {
     List<StudentCourse> mockCourses = List.of(mockCourse);
 
     when(repository.searchStudentByID(testId)).thenReturn(Optional.of(mockStudent));
-    when(repository.searchStudentCourseWithStatus(testId)).thenReturn(mockCourses);
+    when(repository.searchStudentCourseWithStatus(testId, null, null
+        , null, null)).thenReturn(mockCourses);
 
     //実行
     StudentDetail result = sut.getStudent(testId);
@@ -95,7 +138,7 @@ class StudentServiceTest {
     assertEquals(mockStudent, result.getStudent());
     // 必ず１回呼び出されていることを確認する
     verify(repository, times(1)).searchStudentByID(testId);
-    verify(repository, times(1)).searchStudentCourseWithStatus(testId);
+    verify(repository, times(1)).searchStudentCourseWithStatus(testId, null, null, null, null);
   }
 
   @Test

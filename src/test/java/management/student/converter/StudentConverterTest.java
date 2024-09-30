@@ -47,10 +47,12 @@ class StudentConverterTest {
     studentList.add(student);
     studentCourseList.add(studentCourse);
 
+    List<Integer> searchIds = List.of(1);
     // 想定されるリストの設定
     List<StudentDetail> expectedList = List.of(new StudentDetail(student, studentCourseList));
     // 実行
-    List<StudentDetail> actualList = sut.convertStudentDetails(studentList, studentCourseList);
+    List<StudentDetail> actualList = sut.convertStudentDetails(studentList, studentCourseList,
+        searchIds);
     // 検証
     assertThat(expectedList).isEqualTo(actualList);
 
@@ -75,11 +77,55 @@ class StudentConverterTest {
     studentList.add(student);
     studentCourseList.add(studentCourse);
     // 実行
-    List<StudentDetail> actualList = sut.convertStudentDetails(studentList, studentCourseList);
+    List<StudentDetail> actualList = sut.convertStudentDetails(studentList, studentCourseList,
+        null);
     // 検証
     assertThat(actualList.get(0).getStudent()).isEqualTo(student);
     assertThat(actualList.get(0).getStudentCourseList()).isEmpty();
 
+  }
+
+  @Test
+  void 受講生ＩＤの引数がある場合にそのＩＤに紐づく受講生と受講生コースから受講生詳細ができること() {
+
+    //事前準備
+    List<Student> studentList = new ArrayList<>();
+    List<StudentCourse> studentCourseList = new ArrayList<>();
+    List<ApplicationStatus> statuses = new ArrayList<>();
+    // 受講生と受講生コースの作成
+
+    Student student = createStudent();
+    Student testStudent = createStudent();
+    testStudent.setId(2);
+
+    StudentCourse studentCourse = new StudentCourse();
+    studentCourse.setId(1);
+    studentCourse.setStudentId(1); //受講生IDと受講生オブジェクトに設定したIDが同じになるように設定する
+    studentCourse.setCourseName("Javaコース");
+    studentCourse.setStartDate(LocalDateTime.now());
+    studentCourse.setEndDate(LocalDateTime.now().plusYears(1));
+
+    StudentCourse testStudentCourse = new StudentCourse();
+    testStudentCourse.setId(2);
+    testStudentCourse.setStudentId(2); //テスト用受講生IDと受講生オブジェクトに設定したIDが同じになるように設定する
+    testStudentCourse.setCourseName("Javaコース");
+    testStudentCourse.setStartDate(LocalDateTime.now());
+    testStudentCourse.setEndDate(LocalDateTime.now().plusYears(1));
+    //リストに格納
+    studentList.add(student);
+    studentList.add(testStudent);
+
+    studentCourseList.add(studentCourse);
+
+    List<Integer> ids = List.of(1);
+    // 実行
+    List<StudentDetail> actualList = sut.convertStudentDetails(studentList, studentCourseList,
+        ids);
+    // 検証
+    assertThat(actualList.size()).isEqualTo(1);
+    assertThat(actualList.get(0).getStudent()).isEqualTo(student);
+    // idsに格納されている受講生が取得されている
+    assertThat(actualList.get(0).getStudent().getId()).isEqualTo(1);
   }
 
   /**

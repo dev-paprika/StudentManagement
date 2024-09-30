@@ -22,9 +22,27 @@
     name, furigana, nickname, age, phone_number, gender, remarks, email, region
   </sql>
 
-  <!-- 受講生全件検索 -->
+  <!-- 受講生全件検索(絞り込み検索) -->
   <select id="searchStudentList" resultType="management.student.data.Student">
     SELECT * FROM student WHERE delete_flag = 0
+    <if test="id != null">
+      AND id = #{id}
+    </if>
+    <if test="name != null and name != ''">
+      AND name LIKE CONCAT('%', #{name}, '%')
+    </if>
+    <if test="furigana != null and furigana != ''">
+      AND furigana LIKE CONCAT('%', #{furigana}, '%')
+    </if>
+    <if test="email != null and email != ''">
+      AND email LIKE CONCAT('%', #{email}, '%')
+    </if>
+    <if test="phoneNumber != null and phoneNumber != ''">
+      AND phone_number = #{phoneNumber}
+    </if>
+    <if test="age != null">
+      AND age = #{age}
+    </if>
   </select>
 
   <!-- 受講生1件検索 -->
@@ -63,6 +81,18 @@
     WHERE 1=1
     <if test="studentId != null">
       AND sc.student_id = #{studentId}
+    </if>
+    <if test="courseName != null">
+      AND sc.course_name = #{courseName}
+    </if>
+    <if test="startDate != null">
+      AND sc.start_date &gt;= #{startDate}
+    </if>
+    <if test="endDate != null">
+      AND sc.end_date &lt;= #{endDate}
+    </if>
+    <if test="status != null">
+      AND appStatus.status = #{status}
     </if>
   </select>
 

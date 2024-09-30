@@ -25,17 +25,23 @@ public class StudentConverter {
    * @Param applicationStatusList 申込状況リスト
    */
   public List<StudentDetail> convertStudentDetails(List<Student> studentList,
-      List<StudentCourse> courseList) {
+      List<StudentCourse> courseList, List<Integer> ids) {
 
     List<StudentDetail> studentDetailList = new ArrayList<>();
     //受講生と受講生テーブルで紐づくものを受講生詳細に変換
     studentList.forEach(student -> {
-      StudentDetail studentDetail = new StudentDetail();
-      studentDetail.setStudent(student);
-      List<StudentCourse> convertCourseList = courseList.stream()
-          .filter(course -> student.getId() == course.getStudentId()).collect(Collectors.toList());
-      studentDetail.setStudentCourseList(convertCourseList);
-      studentDetailList.add(studentDetail);
+      //　受講生コースが検索条件で絞っている場合はIdsに値が入っている
+      // 受講生コースが検索条件で絞り込みなし、もしくは絞り込まれた受講生IDと紐づく場合に受講生詳細を作成
+      if (ids == null || ids.contains(student.getId())) {
+        StudentDetail studentDetail = new StudentDetail();
+        studentDetail.setStudent(student);
+        // 受講生に紐づく受講生コースを取得
+        List<StudentCourse> convertCourseList = courseList.stream()
+            .filter(course -> student.getId() == course.getStudentId())
+            .collect(Collectors.toList());
+        studentDetail.setStudentCourseList(convertCourseList);
+        studentDetailList.add(studentDetail);
+      }
     });
     return studentDetailList;
   }
