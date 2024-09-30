@@ -62,8 +62,35 @@ public class StudentService {
     List<StudentCourse> studentCoursesList = this.repository.searchStudentCourseWithStatus(
         studentId,
         courseName, courseStartDate, courseEndDate, status);
-    return this.converter.convertStudentDetails(studentList, studentCoursesList);
+
+    List<Integer> searchIds = null;
+    if (hasCourseFilter(courseName, courseStartDate, courseEndDate, status)) {
+      //受講生コースに絞り込み条件がある場合はそれに紐づく受講生IDを抽出する
+      searchIds = studentCoursesList.stream()
+          .map(StudentCourse::getStudentId)
+          .distinct()
+          .toList();
+    }
+
+    return this.converter.convertStudentDetails(studentList, studentCoursesList, searchIds);
   }
+
+  /**
+   * 受講生コースの検索条件が指定されているか判定する
+   *
+   * @param courseName      　受講生コース名
+   * @param courseStartDate 　受講開始日
+   * @param courseEndDate   　　受講終了日
+   * @param status          　申込状況
+   * @return true/false
+   */
+  boolean hasCourseFilter(String courseName, LocalDateTime courseStartDate,
+      LocalDateTime courseEndDate, String status) {
+
+    return courseName != null || courseStartDate != null || courseEndDate != null
+        || status != null;
+  }
+
 
   /**
    * 受講生詳細の情報（1件）を取得

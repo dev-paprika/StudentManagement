@@ -77,7 +77,7 @@ class StudentServiceTest {
         , null, null, null, null);
     verify(repository, times(1)).searchStudentCourseWithStatus(null,
         null, null, null, null);
-    verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList);
+    verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList, null);
 
   }
 
@@ -105,7 +105,7 @@ class StudentServiceTest {
         .thenReturn(studentCourseList);
 
     List<StudentDetail> expectedDetails = new ArrayList<>();
-    when(converter.convertStudentDetails(studentList, studentCourseList)).thenReturn(
+    when(converter.convertStudentDetails(studentList, studentCourseList, List.of(1))).thenReturn(
         expectedDetails);
 
     // 実行
@@ -116,7 +116,7 @@ class StudentServiceTest {
     verify(repository, times(1)).searchStudentList(studentId, name, kana, email, phoneNumber, age);
     verify(repository, times(1)).searchStudentCourseWithStatus(studentId, courseName,
         courseStartDate, courseEndDate, status);
-    verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList);
+    verify(converter, times(1)).convertStudentDetails(studentList, studentCourseList, List.of(1));
   }
 
   @Test
